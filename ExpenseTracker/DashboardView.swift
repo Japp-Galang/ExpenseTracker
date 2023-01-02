@@ -4,9 +4,16 @@ import Charts
 struct DashboardView: View {
     
     @StateObject private var vm = CloudKitViewModel()
-        
     
+    init(){
+        let calendar = Calendar.current
+        let today = Date()
+        let lastMonth = calendar.date(byAdding: .month, value: -1, to: today)
+    }
     
+
+    
+
     var body: some View{
         NavigationView{
             ZStack{
@@ -27,20 +34,26 @@ struct DashboardView: View {
                             .fill(Color.blue)
                         PieChart(startAngle: .degrees(270), endAngle: .degrees(360))
                             .fill(Color.yellow)
-                        
                     }
-                    
                     
                     Text("Monthly Expenses for the past year")
                         .font(.title3)
                         .padding([.top], 20)
-                    Chart(vm.monthlyTotalCosts) { item in
+                    /*
+                    Chart(vm.monthlyDataPoints) { item in
                         BarMark(
                             x: .value("Month&Year", item.monthAndYear),
                             y: .value("TotalExpenses", item.totalCosts)
                         )
                     }
-                    Text("\(vm.monthlyTotalCosts.count)")
+                    */
+                    Button(action: {
+                        
+                        for element in vm.monthlyDataPoints {
+                            //print(element.monthAndYear)
+                        }
+                        
+                    }) {Text("SDF")}
                         
                     
                     

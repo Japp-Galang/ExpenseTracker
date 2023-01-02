@@ -25,10 +25,7 @@ struct ShowExpensesView: View {
                 backdrop
                 VStack{
                     columnNames
-                    
-                    
-                    
-                    
+                
                     ForEach(0..<vm.expenses.count){index in
                         HStack{
                             VStack{

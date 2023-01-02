@@ -17,11 +17,15 @@ class CloudKitViewModel: ObservableObject{
     @Published var expenseCostValue: Double? = nil
     @Published var selection = "Genre Select"
     @Published var expenses: [[String]] = []
-    @Published var monthlyTotalCosts: [MonthlyExpense] = []
+    @Published var monthlyDataPoints: [MonthlyData] = []
+    
+
     
     init(){
         fetchItems()
+        fillImportantData()
     }
+    
     private func getiCloudStatus() {
         CKContainer.default().accountStatus { [weak self] returnedStatus, returnedError in DispatchQueue.main.async{
             switch returnedStatus{
@@ -79,6 +83,7 @@ class CloudKitViewModel: ObservableObject{
         }
     }
     
+//--------------------------------//
     func fetchItems(){
         let predicate = NSPredicate(value: true)
         let query = CKQuery(recordType: "Expense", predicate: predicate)
@@ -87,15 +92,10 @@ class CloudKitViewModel: ObservableObject{
         
         var returnedItems: [[String]] = []
         
-        //Key data points to return
-        var monthlyTotalCostsTemp: [MonthlyExpense] = []
-        var temp: Double = 0
-        var monthlyCounter: String = "0000-01"
-        
-        
         queryOperation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
             switch returnedResult {
                 case .success(let record):
+                    
                     guard let nameFetch = record["Name"] as? String else { return }
                     
                     guard var expenseCostFetch = "\(record["ExpenseCost"])" as? String else { return }
@@ -103,41 +103,24 @@ class CloudKitViewModel: ObservableObject{
                     
                     guard var expenseDateFetch = "\(record["Date"])" as? String else { return }
                     expenseDateFetch = takeSubstring(word: expenseDateFetch, beginning: 9, end: -16)
-                    var currentMonthIteration = takeSubstring(word: expenseDateFetch, beginning: 0, end: -3)
                     
+                
                     guard let genreFetch = record["Genre"] as? String else { return }
         
                     let addThis: [String] = [nameFetch, expenseCostFetch, expenseDateFetch, genreFetch]
                     returnedItems.append(addThis)
-                    
-                    //handling key data points
-                    if(monthlyCounter != currentMonthIteration){
-                        let tempMonthlyExpense = MonthlyExpense(totalCosts: temp, monthAndYear: monthlyCounter)
-                        monthlyTotalCostsTemp.append(tempMonthlyExpense)
-                        monthlyCounter = currentMonthIteration
-                        temp = 0
-                        
-                    }
-                    temp += Double(expenseCostFetch) ?? 0
                 
                 case .failure(let error):
                     print("Error recordMatchedBlock: \(error)")
             }
-            let monthlyExpenseFinalMonth = MonthlyExpense(totalCosts: temp, monthAndYear: monthlyCounter)
-            monthlyTotalCostsTemp.append(monthlyExpenseFinalMonth)
-            monthlyTotalCostsTemp.removeFirst()
+            
         }
         
         
         queryOperation.queryResultBlock = {[weak self] returnedResult in
-            print("RETURNED RESULT: \(returnedResult)")
+            //print("RETURNED RESULT: \(returnedResult)")
             returnedItems = returnedItems.reversed() //This is so that the ShowExpensesView shows the expenses from the latest to oldest
             self?.expenses = returnedItems
-            self?.monthlyTotalCosts = monthlyTotalCostsTemp
-            for i in monthlyTotalCostsTemp {
-                print(i.monthAndYear)
-            }
-            
         }
         addOperations(operation: queryOperation)
         
@@ -146,6 +129,56 @@ class CloudKitViewModel: ObservableObject{
     func addOperations(operation: CKDatabaseOperation) {
         CKContainer.default().privateCloudDatabase.add(operation)
     }
+    
+//--------------------------------//
+    func fillImportantData(){
+        var importantDataPoints: [String:MonthlyData] = [:]
+        
+        let calendar = Calendar.current
+        
+        // Get the current date and month
+        var firstOfThisMonthComponents = calendar.dateComponents([.year, .month], from: Date())
+        firstOfThisMonthComponents.day = 1                                                         // Set the first day of the current month
+
+        // Get the date for the first day of the current month
+        let firstOfMonth = calendar.date(from: firstOfThisMonthComponents)!
+        let firstOfMonthNMonthsAgo = calendar.date(byAdding: .month, value: -12, to: firstOfMonth)
+        let firstOfMonthNMonthsAgoNSDate = firstOfMonthNMonthsAgo as! NSDate
+    
+        // get the last day of current month
+        var lastofMonthComponents = calendar.dateComponents([.year, .month], from: Date())          // Get the current date and month
+        lastofMonthComponents.day = calendar.range(of: .day, in: .month, for: Date())!.count        // Set the day to the last day of the month
+        let lastOfMonth = calendar.date(from: lastofMonthComponents)!                               // Get the date for the last day of the current month
+        let lastOfMonthNSDate = lastOfMonth as NSDate
+        
+        //Querying the data to get data points of the last n months
+        let predicate = NSPredicate(format: "Date > %@ AND Date < %@", firstOfMonthNMonthsAgoNSDate, lastOfMonthNSDate)
+        let query = CKQuery(recordType: "Expense", predicate: predicate)
+        let queryOperation = CKQueryOperation(query: query)
+    //----------------------------------------
+        //Prefill output with the needed YYYY-MM
+        let calendar2 = Calendar.current
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM"
+
+        let startDate = Date()
+        let endDate = calendar2.date(byAdding: .year, value: 1, to: startDate)!
+
+        var date = startDate
+        while date <= endDate {
+            let month = dateFormatter.string(from: date)
+            print(month)
+            date = calendar.date(byAdding: .month, value: 1, to: date)!
+        }
+    //----------------------------------------
+        
+        queryOperation.recordFetchedBlock = { (record) in
+            print(record)
+        }
+        addOperations(operation: queryOperation)
+        
+    }
+    
 }
 
 
@@ -161,10 +194,14 @@ func takeSubstring(word: String, beginning: Int, end:Int) -> String{
 }
 
 
-struct MonthlyExpense: Identifiable {
+
+struct MonthlyData: Identifiable {
     let id = UUID()
-    let totalCosts: Double
-    let monthAndYear: String
-    
+    var totalCosts: Double
+    var categoryTransportation: Double
+    var categoryRestaurant: Double
+    var categoryClothes: Double
+    var categoryEntertainment: Double
+    var categoryGroceries: Double
 }
 
