@@ -49,9 +49,13 @@ struct DashboardView: View {
                     */
                     Button(action: {
                         
-                        for element in vm.monthlyDataPoints {
-                            //print(element.monthAndYear)
+                        
+                        for (key, value) in vm.monthlyDataPoints {
+                            print(key)
                         }
+                           
+                        
+                        print(vm.monthlyDataPoints.count)
                         
                     }) {Text("SDF")}
                         

@@ -17,7 +17,7 @@ class CloudKitViewModel: ObservableObject{
     @Published var expenseCostValue: Double? = nil
     @Published var selection = "Genre Select"
     @Published var expenses: [[String]] = []
-    @Published var monthlyDataPoints: [MonthlyData] = []
+    @Published var monthlyDataPoints: [String:MonthlyData] = [:]
     
 
     
@@ -159,22 +159,31 @@ class CloudKitViewModel: ObservableObject{
         //Prefill output with the needed YYYY-MM
         let calendar2 = Calendar.current
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM"
+        dateFormatter.dateFormat = "YYYY-MM"
 
         let startDate = Date()
         let endDate = calendar2.date(byAdding: .year, value: 1, to: startDate)!
 
-        var date = startDate
-        while date <= endDate {
-            let month = dateFormatter.string(from: date)
-            print(month)
-            date = calendar.date(byAdding: .month, value: 1, to: date)!
+        var date = firstOfMonthNMonthsAgo
+        while date! <= lastOfMonth {
+            let monthAndYear = dateFormatter.string(from: date!)
+            importantDataPoints[monthAndYear] = MonthlyData(totalCosts: 0, categoryTransportation: 0, categoryRestaurant: 0, categoryClothes: 0, categoryEntertainment: 0, categoryGroceries: 0)
+            date = calendar.date(byAdding: .month, value: 1, to: date!)!
         }
+        
+       
+        
     //----------------------------------------
         
         queryOperation.recordFetchedBlock = { (record) in
-            print(record)
+            //print(record)
         }
+        
+        queryOperation.queryResultBlock = {[weak self] returnedResult in
+            //print("RETURNED RESULT: \(returnedResult)")
+            self?.monthlyDataPoints = importantDataPoints
+        }
+        
         addOperations(operation: queryOperation)
         
     }
