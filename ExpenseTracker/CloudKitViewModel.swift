@@ -98,13 +98,13 @@ class CloudKitViewModel: ObservableObject{
                     
                     guard let nameFetch = record["Name"] as? String else { return }
                     
-                    guard var expenseCostFetch = "\(record["ExpenseCost"])" as? String else { return }
+                    var expenseCostFetch = String(describing: record["ExpenseCost"])
                     expenseCostFetch = takeSubstring(word: expenseCostFetch, beginning: 9, end: -1)
                     
-                    guard var expenseDateFetch = "\(record["Date"])" as? String else { return }
+                    var expenseDateFetch =  String(describing: record["Date"])
                     expenseDateFetch = takeSubstring(word: expenseDateFetch, beginning: 9, end: -16)
                     
-                
+                    
                     guard let genreFetch = record["Genre"] as? String else { return }
         
                     let addThis: [String] = [nameFetch, expenseCostFetch, expenseDateFetch, genreFetch]
@@ -159,7 +159,7 @@ class CloudKitViewModel: ObservableObject{
         //Prefill output with the needed YYYY-MM
         let calendar2 = Calendar.current
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YYYY-MM"
+        dateFormatter.dateFormat = "MM-YYYY"
 
         let startDate = Date()
         let endDate = calendar2.date(byAdding: .year, value: 1, to: startDate)!
@@ -167,21 +167,54 @@ class CloudKitViewModel: ObservableObject{
         var date = firstOfMonthNMonthsAgo
         while date! <= lastOfMonth {
             let monthAndYear = dateFormatter.string(from: date!)
-            importantDataPoints[monthAndYear] = MonthlyData(totalCosts: 0, categoryTransportation: 0, categoryRestaurant: 0, categoryClothes: 0, categoryEntertainment: 0, categoryGroceries: 0)
+            importantDataPoints[monthAndYear] = MonthlyData(totalCosts: 0, categoryTransportation: 0, categoryRestaurant: 0, categoryClothes: 0, categoryEntertainment: 0, categoryGroceries: 0, categoryOther: 0)
             date = calendar.date(byAdding: .month, value: 1, to: date!)!
         }
-        
-       
-        
     //----------------------------------------
         
-        queryOperation.recordFetchedBlock = { (record) in
-            //print(record)
+        queryOperation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
+            switch returnedResult {
+                case .success(let record):
+                    
+                    //gets the month and year of the record in this format: MM-YYYY
+                    let expenseDateFetch =  String(describing: record["Date"])
+                    let expenseDateYear = takeSubstring(word: expenseDateFetch, beginning: 9, end: -22)
+                    let expenseDateMonth = takeSubstring(word: expenseDateFetch, beginning: 14, end: -19)
+                    let monthAndYear = expenseDateMonth + "-" + expenseDateYear
+                    
+                    let expenseCostValue = (record["ExpenseCost"] as? Double) ?? 0
+                    print(expenseCostValue)
+                    guard let genreFetch = record["Genre"] as? String else { return }
+                    
+                    //Updates the values in importantDataPoints
+                    importantDataPoints[monthAndYear]?.totalCosts += expenseCostValue
+                    switch genreFetch {
+                        case "Transportation/gas":
+                            importantDataPoints[monthAndYear]?.categoryTransportation += expenseCostValue
+                        case "Clothes":
+                            importantDataPoints[monthAndYear]?.categoryClothes += expenseCostValue
+                        case "Entertainment/Leisure":
+                            importantDataPoints[monthAndYear]?.categoryEntertainment += expenseCostValue
+                        case "Restaurants/Cafe":
+                            importantDataPoints[monthAndYear]?.categoryRestaurant += expenseCostValue
+                        case "Groceries":
+                            importantDataPoints[monthAndYear]?.categoryGroceries += expenseCostValue
+                        case "Other":
+                            importantDataPoints[monthAndYear]?.categoryOther += expenseCostValue
+                        default:
+                            print("default")
+                    }
+                
+                case .failure(let error):
+                    print("Error recordMatchedBlock: \(error)")
+            }
+            
         }
         
         queryOperation.queryResultBlock = {[weak self] returnedResult in
             //print("RETURNED RESULT: \(returnedResult)")
             self?.monthlyDataPoints = importantDataPoints
+            
         }
         
         addOperations(operation: queryOperation)
@@ -212,5 +245,6 @@ struct MonthlyData: Identifiable {
     var categoryClothes: Double
     var categoryEntertainment: Double
     var categoryGroceries: Double
+    var categoryOther: Double
 }
 

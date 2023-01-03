@@ -14,7 +14,7 @@ struct AddExpenseView: View {
     
     @StateObject private var vm = CloudKitViewModel()
     
-    let genres = ["Genre Select", "Transportation/gas", "Restaurants/Cafe", "Clothes", "Entertainment/Leisure", "Groceries"]
+    let genres = ["Genre Select", "Transportation/gas", "Restaurants/Cafe", "Clothes", "Entertainment/Leisure", "Groceries", "Other"]
    
     var body: some View{
         
