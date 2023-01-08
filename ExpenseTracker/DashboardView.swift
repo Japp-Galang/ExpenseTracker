@@ -1,66 +1,92 @@
 import SwiftUI
 import Charts
 
+let PRIMARY_ACCENT = Color(red: 0.08, green: 0.16, blue: 0.31)
+let SECONDARY_ACCENT = Color(red: 0.8, green: 0.8, blue: 1.0)
+//Color(red: 0.15, green: 0.29, blue: 0.43)
+let TEXT_COLOR =  Color(red: 1.0, green: 1.0, blue: 1.0)
+
+
+
 struct DashboardView: View {
     
     @StateObject private var vm = CloudKitViewModel()
-    
-    init(){
-        let calendar = Calendar.current
-        let today = Date()
-        let lastMonth = calendar.date(byAdding: .month, value: -1, to: today)
-    }
-    
-
-    
-
+    var value = 0.0
     var body: some View{
         NavigationView{
             ZStack{
                 backdrop
                 VStack{
                     header
+                    Spacer()
                     //Text("IS SIGNED IN: \(vm.isSignedInToiCloud.description.uppercased())")
                     //Text(vm.error)
+                    Text(formatToCurrency(price: String(vm.monthlyDataPointsChart.last?.totalCosts ?? 0)))
+                        .font(.system(size: 27))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding([.leading], 15)
+                        .foregroundColor(TEXT_COLOR)
                     
-                    ZStack{
-                        PieChart(startAngle: .degrees(0), endAngle: .degrees(90))
-                            .fill(Color.red)
-                        
-                        PieChart(startAngle: .degrees(90), endAngle: .degrees(180))
-                            .fill(Color.green)
-                        
-                        PieChart(startAngle: .degrees(180), endAngle: .degrees(270))
-                            .fill(Color.blue)
-                        PieChart(startAngle: .degrees(270), endAngle: .degrees(360))
-                            .fill(Color.yellow)
-                    }
+                    Text("Money spent this month")
+                        .italic()
+                        .font(.system(size:12))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding([.leading], 15)
+                        .foregroundColor(TEXT_COLOR)
                     
-                    Text("Monthly Expenses for the past year")
-                        .font(.title3)
-                        .padding([.top], 20)
-                    /*
-                    Chart(vm.monthlyDataPoints) { item in
-                        BarMark(
-                            x: .value("Month&Year", item.monthAndYear),
-                            y: .value("TotalExpenses", item.totalCosts)
+                    Rectangle()
+                        .fill(SECONDARY_ACCENT)
+                        .overlay(
+                            VStack{
+                                Text("Monthly Expenses for the past 6 months")
+                                    .font(.title3)
+                                    .padding([.top], 20)
+                                    .foregroundColor(TEXT_COLOR)
+                                
+                                Chart(vm.monthlyDataPointsChart) { item in
+                                    BarMark(
+                                        x: .value("Month&Year", item.monthAndYear),
+                                        y: .value("TotalExpenses", item.totalCosts)
+                                    )
+                                    .foregroundStyle(Color.black.gradient)
+                                    .cornerRadius(5)
+                                    
+                                }
+                                
+                                .padding(10)
+                            }
+                            
                         )
-                    }
-                    */
-                    Button(action: {
+                        .cornerRadius(15)
+                        .padding([.leading, .trailing], 15)
+                    
+                    
+                    Rectangle()
+                        .fill(SECONDARY_ACCENT)
+                        .overlay(
+                            ZStack{
+                                PieChart(startAngle: .degrees(0), endAngle: .degrees(90))
+                                    .fill(Color.red)
+                                
+                                PieChart(startAngle: .degrees(90), endAngle: .degrees(180))
+                                    .fill(Color.green)
+                                
+                                PieChart(startAngle: .degrees(180), endAngle: .degrees(270))
+                                    .fill(Color.blue)
+                                PieChart(startAngle: .degrees(270), endAngle: .degrees(360))
+                                    .fill(Color.yellow)
+                            }
+                                .padding(15)
+                        )
+                        .cornerRadius(15)
                         
+                        .padding([.leading, .trailing], 15)
                         
-                        for (key, value) in vm.monthlyDataPoints {
-                            print(key)
-                        }
-                           
-                        
-                        print(vm.monthlyDataPoints.count)
-                        
-                    }) {Text("SDF")}
                         
                     
                     
+                    
+                   
                     showAllExpenses
                     addNewExpense
                 }
@@ -73,8 +99,8 @@ struct DashboardView: View {
 
 extension DashboardView {
     public var backdrop: some View {
-        LinearGradient(colors: [.blue, .red], startPoint: .topLeading, endPoint: .bottomTrailing)
-            .edgesIgnoringSafeArea(.all)
+        PRIMARY_ACCENT
+            .ignoresSafeArea()
     }
     
     
@@ -82,7 +108,10 @@ extension DashboardView {
         Text("Budget Tracker")
             .font(.title)
             .padding(.top, 12.0)
+            .foregroundColor(TEXT_COLOR)
     }
+    
+    
     
     private var showAllExpenses: some View{
         NavigationLink(destination: ShowExpensesView(vm: .constant(CloudKitViewModel())), label: {
@@ -139,6 +168,9 @@ struct PieChart: Shape {
         return p
     }
 }
+
+
+
 
 
 

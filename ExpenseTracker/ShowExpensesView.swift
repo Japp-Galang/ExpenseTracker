@@ -13,10 +13,7 @@ import Charts
 
 struct ShowExpensesView: View {
     
-    var counterRecord = 0
-    
     @Binding var vm: CloudKitViewModel
-   
     
     var body: some View {
         NavigationView{

@@ -18,7 +18,7 @@ class CloudKitViewModel: ObservableObject{
     @Published var selection = "Genre Select"
     @Published var expenses: [[String]] = []
     @Published var monthlyDataPoints: [String:MonthlyData] = [:]
-    
+    @Published var monthlyDataPointsChart: [MonthlyData] = []
 
     
     init(){
@@ -142,17 +142,17 @@ class CloudKitViewModel: ObservableObject{
 
         // Get the date for the first day of the current month
         let firstOfMonth = calendar.date(from: firstOfThisMonthComponents)!
-        let firstOfMonthNMonthsAgo = calendar.date(byAdding: .month, value: -12, to: firstOfMonth)
-        let firstOfMonthNMonthsAgoNSDate = firstOfMonthNMonthsAgo as! NSDate
+        let firstOfMonthNMonthsAgo = calendar.date(byAdding: .month, value: -5, to: firstOfMonth)
+        let firstOfMonthNMonthsAgoNSDate = firstOfMonthNMonthsAgo! as NSDate
     
         // get the last day of current month
         var lastofMonthComponents = calendar.dateComponents([.year, .month], from: Date())          // Get the current date and month
         lastofMonthComponents.day = calendar.range(of: .day, in: .month, for: Date())!.count        // Set the day to the last day of the month
         let lastOfMonth = calendar.date(from: lastofMonthComponents)!                               // Get the date for the last day of the current month
-        let lastOfMonthNSDate = lastOfMonth as NSDate
+        
         
         //Querying the data to get data points of the last n months
-        let predicate = NSPredicate(format: "Date > %@ AND Date < %@", firstOfMonthNMonthsAgoNSDate, lastOfMonthNSDate)
+        let predicate = NSPredicate(format: "Date > %@", firstOfMonthNMonthsAgoNSDate)
         let query = CKQuery(recordType: "Expense", predicate: predicate)
         let queryOperation = CKQueryOperation(query: query)
     //----------------------------------------
@@ -161,15 +161,16 @@ class CloudKitViewModel: ObservableObject{
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM-YYYY"
 
-        let startDate = Date()
-        let endDate = calendar2.date(byAdding: .year, value: 1, to: startDate)!
-
+        
         var date = firstOfMonthNMonthsAgo
         while date! <= lastOfMonth {
             let monthAndYear = dateFormatter.string(from: date!)
-            importantDataPoints[monthAndYear] = MonthlyData(totalCosts: 0, categoryTransportation: 0, categoryRestaurant: 0, categoryClothes: 0, categoryEntertainment: 0, categoryGroceries: 0, categoryOther: 0)
-            date = calendar.date(byAdding: .month, value: 1, to: date!)!
+            importantDataPoints[monthAndYear] = MonthlyData(monthAndYear: monthAndYear, totalCosts: 0, categoryTransportation: 0, categoryRestaurant: 0, categoryClothes: 0, categoryEntertainment: 0, categoryGroceries: 0, categoryOther: 0)
+            date = calendar2.date(byAdding: .month, value: 1, to: date!)!
+            
         }
+        
+        
     //----------------------------------------
         
         queryOperation.recordMatchedBlock = { (returnedRecordID, returnedResult) in
@@ -183,11 +184,14 @@ class CloudKitViewModel: ObservableObject{
                     let monthAndYear = expenseDateMonth + "-" + expenseDateYear
                     
                     let expenseCostValue = (record["ExpenseCost"] as? Double) ?? 0
-                    print(expenseCostValue)
+                    
                     guard let genreFetch = record["Genre"] as? String else { return }
                     
                     //Updates the values in importantDataPoints
-                    importantDataPoints[monthAndYear]?.totalCosts += expenseCostValue
+                
+                    
+                importantDataPoints[monthAndYear]?.totalCosts = expenseCostValue
+                    
                     switch genreFetch {
                         case "Transportation/gas":
                             importantDataPoints[monthAndYear]?.categoryTransportation += expenseCostValue
@@ -205,15 +209,29 @@ class CloudKitViewModel: ObservableObject{
                             print("default")
                     }
                 
+                
                 case .failure(let error):
                     print("Error recordMatchedBlock: \(error)")
             }
             
         }
         
+        
+      
+        
         queryOperation.queryResultBlock = {[weak self] returnedResult in
-            //print("RETURNED RESULT: \(returnedResult)")
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM-yyyy"
+            
+            let dashboardMonthlydata = Array(importantDataPoints.values)
+            let sortedDashboardMonthlyData = dashboardMonthlydata.sorted { item1, item2 in
+                let date1 = dateFormatter.date(from:item1.monthAndYear)!
+                let date2 = dateFormatter.date(from: item2.monthAndYear)!
+                return date1 < date2
+            }
+            
             self?.monthlyDataPoints = importantDataPoints
+            self?.monthlyDataPointsChart = sortedDashboardMonthlyData
             
         }
         
@@ -239,6 +257,7 @@ func takeSubstring(word: String, beginning: Int, end:Int) -> String{
 
 struct MonthlyData: Identifiable {
     let id = UUID()
+    let monthAndYear: String
     var totalCosts: Double
     var categoryTransportation: Double
     var categoryRestaurant: Double
