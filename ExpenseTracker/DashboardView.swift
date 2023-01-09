@@ -34,6 +34,7 @@ struct DashboardView: View {
                         .padding([.leading], 15)
                         .foregroundColor(TEXT_COLOR)
                     
+                    
                     Rectangle()
                         .fill(SECONDARY_ACCENT)
                         .overlay(
@@ -50,9 +51,7 @@ struct DashboardView: View {
                                     )
                                     .foregroundStyle(Color.black.gradient)
                                     .cornerRadius(5)
-                                    
                                 }
-                                
                                 .padding(10)
                             }
                             
@@ -60,30 +59,33 @@ struct DashboardView: View {
                         .cornerRadius(15)
                         .padding([.leading, .trailing], 15)
                     
-                    
-                    Rectangle()
-                        .fill(SECONDARY_ACCENT)
-                        .overlay(
-                            ZStack{
-                                PieChart(startAngle: .degrees(0), endAngle: .degrees(90))
-                                    .fill(Color.red)
-                                
-                                PieChart(startAngle: .degrees(90), endAngle: .degrees(180))
-                                    .fill(Color.green)
-                                
-                                PieChart(startAngle: .degrees(180), endAngle: .degrees(270))
-                                    .fill(Color.blue)
-                                PieChart(startAngle: .degrees(270), endAngle: .degrees(360))
-                                    .fill(Color.yellow)
-                            }
-                                .padding(15)
-                        )
-                        .cornerRadius(15)
-                        
-                        .padding([.leading, .trailing], 15)
-                        
-                        
-                    
+                    HStack{
+                        Spacer()
+                        NavigationLink(destination: Text("Categorical Spending")){
+                            Rectangle()
+                                .fill(SECONDARY_ACCENT)
+                                .overlay(
+                                    
+                                    VStack{
+                                        Text("Categories")
+                                            .padding(12)
+                                            .foregroundColor(TEXT_COLOR)
+                                        
+                                        formatCategorySpending(category: "Transportation")
+                                        formatCategorySpending(category: "Clothes")
+                                        formatCategorySpending(category: "Entertainment")
+                                        formatCategorySpending(category: "Restaurants")
+                                        formatCategorySpending(category: "Groceries")
+                                        formatCategorySpending(category: "Other")
+                                        Spacer()
+                                    }
+                                    
+                                )
+                                .cornerRadius(15)
+                                .frame(maxWidth: 180)
+                                .padding([.leading, .trailing], 15)
+                        }
+                    }
                     
                     
                    
@@ -111,8 +113,7 @@ extension DashboardView {
             .foregroundColor(TEXT_COLOR)
     }
     
-    
-    
+
     private var showAllExpenses: some View{
         NavigationLink(destination: ShowExpensesView(vm: .constant(CloudKitViewModel())), label: {
             Text("Show All Expenses")
@@ -136,6 +137,8 @@ extension DashboardView {
             )
         })
     }
+    
+    
 }
 
 
@@ -169,7 +172,18 @@ struct PieChart: Shape {
     }
 }
 
-
+struct formatCategorySpending: View{
+    let category: String
+    
+    var body: some View{
+        return Text("\(category): ")
+                .foregroundColor(TEXT_COLOR)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding([.top], 5)
+                .padding([.leading], 5)
+    }
+   
+}
 
 
 
