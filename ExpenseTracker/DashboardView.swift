@@ -1,7 +1,7 @@
 import SwiftUI
 import Charts
 
-let PRIMARY_ACCENT = Color(red: 0.15 , green: 0.16, blue: 0.21)
+let PRIMARY_ACCENT = Color(red: 0.0 , green: 0.0, blue: 0.0)
 let SECONDARY_ACCENT = Color(red: 0.22, green: 0.24, blue: 0.27)
 //Color(red: 0.15, green: 0.29, blue: 0.43)
 let TEXT_COLOR =  Color(red: 1.0, green: 1.0, blue: 1.0)
@@ -30,10 +30,13 @@ struct DashboardView: View {
                     featuredData
                     monthlyExpensesPastMonths
                     
-                    Spacer().frame(height: 25)
+                    Spacer().frame(height: 15)
                     //mid section
                     HStack{
-                        showAllExpenses
+                        VStack{
+                            showAllExpenses
+                        }
+                        
                         showCategories
                     }
                     
@@ -110,28 +113,29 @@ extension DashboardView {
 
     private var showAllExpenses: some View{
         
-        Button(action: {
-            
-        }){
+        NavigationLink(destination: ShowExpensesView(vm: .constant(CloudKitViewModel())), label: {
             Rectangle()
                 .fill(SECONDARY_ACCENT)
                 .overlay(
                     Text("Expenses")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(TEXT_COLOR)
                 
                 )
-                .frame(maxWidth: 180)
+                
+                
                 .cornerRadius(15)
-                .padding([.leading], 15)
+                .padding([.leading], 17)
                 .padding([.trailing], 5)
-        }
+        
+                .frame(maxWidth: 130, maxHeight: .infinity, alignment: .topLeading)
+        })
+        
+            
         
     }
     
     private var showCategories: some View{
-        Button(action: {
-            showingCategories.toggle()
-        }) {
+        NavigationLink(destination: ShowDetailedCategoriesView(vm: .constant(CloudKitViewModel())), label: {
             Rectangle()
                 .fill(SECONDARY_ACCENT)
                 .overlay(
@@ -141,20 +145,27 @@ extension DashboardView {
                             .padding(12)
                             .foregroundColor(TEXT_COLOR)
                         
-                        formatCategorySpending(category: "Transportation")
-                        formatCategorySpending(category: "Clothes")
-                        formatCategorySpending(category: "Entertainment")
-                        formatCategorySpending(category: "Restaurants")
-                        formatCategorySpending(category: "Groceries")
-                        formatCategorySpending(category: "Other")
+                        formatCategorySpending(category: "Transportation", costs: vm.monthlyDataPointsChart.last?.categoryTransportation ?? 0.0)
+                        
+                        formatCategorySpending(category: "Clothes", costs: vm.monthlyDataPointsChart.last?.categoryClothes ?? 0.0)
+                        
+                        formatCategorySpending(category: "Entertainment", costs: vm.monthlyDataPointsChart.last?.categoryEntertainment ?? 0.0)
+                        
+                        formatCategorySpending(category: "Restaurants", costs: vm.monthlyDataPointsChart.last?.categoryRestaurant ?? 0.0)
+                        
+                        formatCategorySpending(category: "Groceries", costs: vm.monthlyDataPointsChart.last?.categoryGroceries ?? 0.0)
+                        
+                        formatCategorySpending(category: "Other", costs: vm.monthlyDataPointsChart.last?.categoryOther ?? 0.0)
+                        
+                        
                         Spacer()
                     }
                     
                 )
                 .cornerRadius(15)
-                .frame(maxWidth: 180)
-                .padding([.leading, .trailing], 15)
-        }
+                .frame(maxWidth: 390)
+                .padding(.trailing, 17)
+        })
         
     }
         
@@ -178,48 +189,29 @@ extension DashboardView {
 
 
 
-struct PieChart: Shape {
-    var startAngle: Angle
-    var endAngle: Angle
-    var clockwise: Bool = false
 
-    func path(in rect: CGRect) -> Path {
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = min(rect.width, rect.height) / 2
-        let start = CGPoint(
-            x: center.x + radius * cos(CGFloat(startAngle.radians)),
-            y: center.y + radius * sin(CGFloat(startAngle.radians))
-        )
-
-        var p = Path()
-        p.move(to: center)
-        p.addLine(to: start)
-        p.addArc(
-            center: center,
-            radius: radius,
-            startAngle: startAngle,
-            endAngle: endAngle,
-            clockwise: clockwise
-        )
-        p.addLine(to: center)
-
-        return p
-    }
-}
 
 struct formatCategorySpending: View{
     let category: String
+    let costs: Double
     
     var body: some View{
-        return Text("\(category): ")
+        return
+        HStack{
+            Text("\(category): ")
+                    .foregroundColor(TEXT_COLOR)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding([.top], 5)
+                    .padding([.leading], 7)
+            
+            Text("\(formatToCurrency(price: String(costs)))")
                 .foregroundColor(TEXT_COLOR)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding([.top], 5)
-                .padding([.leading], 5)
+                .padding([.trailing], 10)
+        }
     }
-   
 }
-
 
 
 

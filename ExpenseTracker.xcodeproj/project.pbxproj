@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DDDA8CE7296E105200AC710B /* ShowDetailedCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDA8CE6296E105200AC710B /* ShowDetailedCategoriesView.swift */; };
 		DDDFE2A02960EE9B008E5C41 /* ExpenseTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDFE29F2960EE9B008E5C41 /* ExpenseTrackerApp.swift */; };
 		DDDFE2A42960EE9C008E5C41 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DDDFE2A32960EE9C008E5C41 /* Assets.xcassets */; };
 		DDDFE2A72960EE9C008E5C41 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DDDFE2A62960EE9C008E5C41 /* Preview Assets.xcassets */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DDDA8CE6296E105200AC710B /* ShowDetailedCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDetailedCategoriesView.swift; sourceTree = "<group>"; };
 		DDDFE29C2960EE9B008E5C41 /* ExpenseTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExpenseTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDDFE29F2960EE9B008E5C41 /* ExpenseTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseTrackerApp.swift; sourceTree = "<group>"; };
 		DDDFE2A32960EE9C008E5C41 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 				DDDFE2B12960F270008E5C41 /* AddExpenseView.swift */,
 				DDDFE2B32960F2C1008E5C41 /* ShowExpensesView.swift */,
 				DDDFE2AD2960F1DB008E5C41 /* CloudKitViewModel.swift */,
+				DDDA8CE6296E105200AC710B /* ShowDetailedCategoriesView.swift */,
 				DDDFE2A32960EE9C008E5C41 /* Assets.xcassets */,
 				DDDFE2A52960EE9C008E5C41 /* Preview Content */,
 			);
@@ -152,6 +155,7 @@
 				DDDFE2A02960EE9B008E5C41 /* ExpenseTrackerApp.swift in Sources */,
 				DDDFE2B42960F2C1008E5C41 /* ShowExpensesView.swift in Sources */,
 				DDDFE2AE2960F1DB008E5C41 /* CloudKitViewModel.swift in Sources */,
+				DDDA8CE7296E105200AC710B /* ShowDetailedCategoriesView.swift in Sources */,
 				DDDFE2B22960F270008E5C41 /* AddExpenseView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
