@@ -267,3 +267,4 @@ struct MonthlyData: Identifiable {
     var categoryOther: Double
 }
 
+

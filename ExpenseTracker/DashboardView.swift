@@ -1,96 +1,46 @@
 import SwiftUI
 import Charts
 
-let PRIMARY_ACCENT = Color(red: 0.08, green: 0.16, blue: 0.31)
-let SECONDARY_ACCENT = Color(red: 0.8, green: 0.8, blue: 1.0)
+let PRIMARY_ACCENT = Color(red: 0.15 , green: 0.16, blue: 0.21)
+let SECONDARY_ACCENT = Color(red: 0.22, green: 0.24, blue: 0.27)
 //Color(red: 0.15, green: 0.29, blue: 0.43)
 let TEXT_COLOR =  Color(red: 1.0, green: 1.0, blue: 1.0)
 
 
 
 struct DashboardView: View {
+   
     
     @StateObject private var vm = CloudKitViewModel()
+    
+    @State var showingCategories = false
+    
     var value = 0.0
     var body: some View{
+        
         NavigationView{
             ZStack{
                 backdrop
                 VStack{
+                    //top section
                     header
                     Spacer()
                     //Text("IS SIGNED IN: \(vm.isSignedInToiCloud.description.uppercased())")
                     //Text(vm.error)
-                    Text(formatToCurrency(price: String(vm.monthlyDataPointsChart.last?.totalCosts ?? 0)))
-                        .font(.system(size: 27))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding([.leading], 15)
-                        .foregroundColor(TEXT_COLOR)
+                    featuredData
+                    monthlyExpensesPastMonths
                     
-                    Text("Money spent this month")
-                        .italic()
-                        .font(.system(size:12))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding([.leading], 15)
-                        .foregroundColor(TEXT_COLOR)
-                    
-                    
-                    Rectangle()
-                        .fill(SECONDARY_ACCENT)
-                        .overlay(
-                            VStack{
-                                Text("Monthly Expenses for the past 6 months")
-                                    .font(.title3)
-                                    .padding([.top], 20)
-                                    .foregroundColor(TEXT_COLOR)
-                                
-                                Chart(vm.monthlyDataPointsChart) { item in
-                                    BarMark(
-                                        x: .value("Month&Year", item.monthAndYear),
-                                        y: .value("TotalExpenses", item.totalCosts)
-                                    )
-                                    .foregroundStyle(Color.black.gradient)
-                                    .cornerRadius(5)
-                                }
-                                .padding(10)
-                            }
-                            
-                        )
-                        .cornerRadius(15)
-                        .padding([.leading, .trailing], 15)
-                    
+                    Spacer().frame(height: 25)
+                    //mid section
                     HStack{
-                        Spacer()
-                        NavigationLink(destination: Text("Categorical Spending")){
-                            Rectangle()
-                                .fill(SECONDARY_ACCENT)
-                                .overlay(
-                                    
-                                    VStack{
-                                        Text("Categories")
-                                            .padding(12)
-                                            .foregroundColor(TEXT_COLOR)
-                                        
-                                        formatCategorySpending(category: "Transportation")
-                                        formatCategorySpending(category: "Clothes")
-                                        formatCategorySpending(category: "Entertainment")
-                                        formatCategorySpending(category: "Restaurants")
-                                        formatCategorySpending(category: "Groceries")
-                                        formatCategorySpending(category: "Other")
-                                        Spacer()
-                                    }
-                                    
-                                )
-                                .cornerRadius(15)
-                                .frame(maxWidth: 180)
-                                .padding([.leading, .trailing], 15)
-                        }
+                        showAllExpenses
+                        showCategories
                     }
                     
-                    
-                   
-                    showAllExpenses
+                    Spacer().frame(height: 25)
+                    //bottom section
                     addNewExpense
+                
                 }
             }
             .navigationBarHidden(true)
@@ -100,9 +50,28 @@ struct DashboardView: View {
 }
 
 extension DashboardView {
-    public var backdrop: some View {
+    
+    private var backdrop: some View {
         PRIMARY_ACCENT
             .ignoresSafeArea()
+    }
+    
+    
+    private var featuredData: some View {
+        VStack{
+            Text(formatToCurrency(price: String(vm.monthlyDataPointsChart.last?.totalCosts ?? 0)))
+                .font(.system(size: 27))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding([.leading], 15)
+                .foregroundColor(TEXT_COLOR)
+            
+            Text("Money spent this month")
+                .italic()
+                .font(.system(size:12))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding([.leading], 15)
+                .foregroundColor(TEXT_COLOR)
+        }
     }
     
     
@@ -113,18 +82,84 @@ extension DashboardView {
             .foregroundColor(TEXT_COLOR)
     }
     
+    private var monthlyExpensesPastMonths: some View{
+        Rectangle()
+            .fill(SECONDARY_ACCENT)
+            .overlay(
+                VStack{
+                    Text("Monthly Expenses for the past 6 months")
+                        .font(.title3)
+                        .padding([.top], 20)
+                        .foregroundColor(TEXT_COLOR)
+                    
+                    Chart(vm.monthlyDataPointsChart) { item in
+                        BarMark(
+                            x: .value("Month&Year", item.monthAndYear),
+                            y: .value("TotalExpenses", item.totalCosts)
+                        )
+                        .foregroundStyle(Color.black.gradient)
+                        .cornerRadius(5)
+                    }
+                    .padding(10)
+                }
+                
+            )
+            .cornerRadius(15)
+            .padding([.leading, .trailing], 15)
+    }
 
     private var showAllExpenses: some View{
-        NavigationLink(destination: ShowExpensesView(vm: .constant(CloudKitViewModel())), label: {
-            Text("Show All Expenses")
-                .foregroundColor(.white)
-                .padding([.top, .bottom], 20)
-                .padding([.leading, .trailing], 120)
-                .background(
-                Capsule()
+        
+        Button(action: {
+            
+        }){
+            Rectangle()
+                .fill(SECONDARY_ACCENT)
+                .overlay(
+                    Text("Expenses")
+                        .foregroundColor(.secondary)
+                
                 )
-        })
+                .frame(maxWidth: 180)
+                .cornerRadius(15)
+                .padding([.leading], 15)
+                .padding([.trailing], 5)
+        }
+        
     }
+    
+    private var showCategories: some View{
+        Button(action: {
+            showingCategories.toggle()
+        }) {
+            Rectangle()
+                .fill(SECONDARY_ACCENT)
+                .overlay(
+                    
+                    VStack{
+                        Text("Categories")
+                            .padding(12)
+                            .foregroundColor(TEXT_COLOR)
+                        
+                        formatCategorySpending(category: "Transportation")
+                        formatCategorySpending(category: "Clothes")
+                        formatCategorySpending(category: "Entertainment")
+                        formatCategorySpending(category: "Restaurants")
+                        formatCategorySpending(category: "Groceries")
+                        formatCategorySpending(category: "Other")
+                        Spacer()
+                    }
+                    
+                )
+                .cornerRadius(15)
+                .frame(maxWidth: 180)
+                .padding([.leading, .trailing], 15)
+        }
+        
+    }
+        
+        
+    
     
     private var addNewExpense: some View{
         NavigationLink(destination: AddExpenseView(), label: {
