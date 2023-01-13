@@ -36,7 +36,6 @@ struct DashboardView: View {
                         VStack{
                             showAllExpenses
                         }
-                        
                         showCategories
                     }
                     

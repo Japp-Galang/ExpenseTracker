@@ -18,119 +18,44 @@ struct ShowDetailedCategoriesView: View {
     //Current Month and Year
     @State private var selectedMonthAndYear = formatToMonthAndYear(formatDate: Date())
     
-    
+    //Pie chart data
+    @State var transportationBegininning: Double = 0
+    @State var transportationEnd: Double = 60
+    @State var restaurantBeginning: Double = 60
+    @State var restaurantEnd: Double = 120
+    @State var entertainmentBeginning: Double = 120
+    @State var entertainmentEnd: Double = 180
+    @State var clothesBeginning: Double = 180
+    @State var clothesEnd: Double = 240
+    @State var groceriesBeginning: Double = 240
+    @State var groceriesEnd: Double = 300
+    @State var otherBeginning: Double = 300
+    @State var otherEnd: Double = 360
     
     
     //Colors of the pie chart and their genre
-    let transportationColor = Color.blue
-    let clothesColor = Color.red
-    let entertainmentColor = Color.green
-    let restaurantsColor = Color.yellow
-    let groceriesColor = Color.pink
-    let otherColor = Color.orange
+    let transportationColor = Color(red: 0.04, green: 0.85, blue: 0.84)
+    let clothesColor = Color(red: 0.20, green: 0.20, blue: 1.00)
+    let entertainmentColor = Color(red: 0.27, green: 0.84, blue: 0.17)
+    let restaurantsColor = Color(red: 1.00, green: 1.00, blue: 0.10)
+    let groceriesColor = Color(red: 1.0, green: 0.00, blue: 0.00)
+    let otherColor = Color(red: 0.67, green: 0.00, blue: 1.00)
+    
+   
     
     var body: some View {
         ZStack{
             backdrop
             VStack{
-                Text(selectedMonthAndYear)
+                
+                //top section
+                header
                 
                 //chart
-                ZStack{
-                    PieChart(startAngle: Angle(degrees: 0), endAngle: Angle(degrees: 60))
-                        .fill(transportationColor)
-                    PieChart(startAngle: Angle(degrees: 60), endAngle: Angle(degrees: 120))
-                        .fill(clothesColor)
-                    PieChart(startAngle: Angle(degrees: 120), endAngle: Angle(degrees: 180))
-                        .fill(entertainmentColor)
-                    PieChart(startAngle: Angle(degrees: 180), endAngle: Angle(degrees: 240))
-                        .fill(restaurantsColor)
-                    PieChart(startAngle: Angle(degrees: 240), endAngle: Angle(degrees: 300))
-                        .fill(groceriesColor)
-                    PieChart(startAngle: Angle(degrees: 300), endAngle: Angle(degrees: 360))
-                        .fill(otherColor)
-                        
-                    
-                }
+                pieChart
             
-                .padding([.trailing, .leading], 15)
-                .frame(height: 400)
-                .scaleEffect(animatePieChart ? 1.0 : 0.25)
-                .onAppear {
-                    withAnimation(.easeIn(duration: 0.50)) {
-                        self.animatePieChart.toggle()
-                    }
-                }
                 //legend
-                Rectangle()
-                    .stroke(SECONDARY_ACCENT, lineWidth: 3)
-                    .overlay(
-                        HStack{
-                            //First Column
-                            VStack{
-                    
-                                HStack{
-                                    Rectangle().frame(width: 10, height: 10)
-                                        .foregroundColor(transportationColor)
-                                    Text("Transportation: ").font(.system(size: 14))
-                                }
-                                
-                                Spacer().frame(height: 15)
-                                
-                                HStack{
-                                    Rectangle().frame(width: 10, height: 10)
-                                        .foregroundColor(restaurantsColor)
-                                    Text("Restaurant/Cafe: ").font(.system(size: 14))
-                                }
-                            }.frame(width: 150, alignment: .leading)
-                            
-                            //Second Column
-                            VStack{
-                               
-                                HStack{
-                                    Rectangle().frame(width: 10, height: 10)
-                                        .foregroundColor(entertainmentColor)
-                                    Text("Entertainment: ").font(.system(size: 14))
-                                }
-                                
-                                Spacer().frame(height: 15)
-                               
-                                HStack{
-                                    Rectangle().frame(width: 10, height: 10)
-                                        .foregroundColor(groceriesColor)
-                                    Text("Groceries: ").font(.system(size: 14))
-                                }
-                                
-                               
-                                
-                            }.frame(width: 125, alignment: .trailing)
-                            
-                            //Third Column
-                            VStack{
-                                
-                                HStack{
-                                    Rectangle().frame(width: 10, height: 10)
-                                        .foregroundColor(clothesColor)
-                                    Text("Clothes: ").font(.system(size: 14))
-                                }
-                                
-                                Spacer().frame(height: 15)
-                                
-                                HStack{
-                                    Rectangle().frame(width: 10, height: 10)
-                                        .foregroundColor(otherColor)
-                                    Text("Other: ").font(.system(size: 14))
-                                }
-                                
-                            }.frame(width: 115, alignment: .leading)
-                        }
-                        
-                    
-                    )
-                    .frame(width: 500, height: 100)
-                
-                    
- 
+                legend
                 Spacer()
             }
             .navigationBarTitle("Category Details")
@@ -138,6 +63,35 @@ struct ShowDetailedCategoriesView: View {
                 .padding([.top, .bottom], 12.0)
                 .foregroundColor(TEXT_COLOR)
         }
+    }
+    
+    func getPieChartData() {
+        let transportationTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryTransportation ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
+        print("transportationTotal: \(transportationTotal)")
+        let restaurantTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryRestaurant ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
+        print("restaurantTotal: \(restaurantTotal)")
+        let entertainmentTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryEntertainment ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
+        print("entertainmentTotal: \(entertainmentTotal)")
+        let clothesTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryClothes ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
+        print("clothesTotal: \(clothesTotal)")
+        let groceriesTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryGroceries ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
+        print("groceriesTotal: \(groceriesTotal)")
+        let otherTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryOther ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
+        print("otherTotal: \(otherTotal)")
+        
+        transportationEnd = transportationTotal
+        restaurantBeginning = transportationEnd
+        restaurantEnd = transportationTotal + restaurantTotal
+        entertainmentBeginning = restaurantEnd
+        entertainmentEnd = entertainmentBeginning + entertainmentTotal
+        clothesBeginning = entertainmentEnd
+        clothesEnd = clothesBeginning + clothesTotal
+        groceriesBeginning = clothesEnd
+        groceriesEnd = groceriesBeginning + groceriesTotal
+        otherBeginning = groceriesEnd
+        otherEnd = otherBeginning + otherTotal
+        
+        
     }
 }
 
@@ -148,6 +102,132 @@ extension ShowDetailedCategoriesView {
             .ignoresSafeArea()
     }
     
+    private var header: some View {
+        HStack{
+            Button(action: {
+                print("asdf")
+            }){
+                RoundedRectangle(cornerRadius: 10).frame(width: 100, height: 40)
+                    .foregroundColor(SECONDARY_ACCENT)
+                    .overlay(
+                        Image(systemName: "arrowshape.left")
+                    )
+            }
+            Text(selectedMonthAndYear)
+            Button(action: {
+                print("asdf")
+            }){
+                RoundedRectangle(cornerRadius: 10).frame(width: 100, height: 40)
+                    .foregroundColor(SECONDARY_ACCENT)
+                    .overlay(
+                        Image(systemName: "arrowshape.right")
+                    )
+            }
+                
+        }
+    }
+    
+    private var pieChart: some View {
+        ZStack{
+            PieChart(startAngle: Angle(degrees: transportationBegininning), endAngle: Angle(degrees: transportationEnd))
+                .fill(transportationColor)
+            PieChart(startAngle: Angle(degrees: clothesBeginning), endAngle: Angle(degrees: clothesEnd))
+                .fill(clothesColor)
+            PieChart(startAngle: Angle(degrees: entertainmentBeginning), endAngle: Angle(degrees: entertainmentEnd))
+                .fill(entertainmentColor)
+            PieChart(startAngle: Angle(degrees: restaurantBeginning), endAngle: Angle(degrees: restaurantEnd))
+                .fill(restaurantsColor)
+            PieChart(startAngle: Angle(degrees: groceriesBeginning), endAngle: Angle(degrees: groceriesEnd))
+                .fill(groceriesColor)
+            PieChart(startAngle: Angle(degrees: otherBeginning), endAngle: Angle(degrees: otherEnd))
+                .fill(otherColor)
+        }
+        .padding(15)
+        .frame(height: 350)
+        .scaleEffect(animatePieChart ? 1.0 : 0.5)
+        .onAppear {
+            
+            withAnimation(.easeIn(duration: 0.50)) {
+                self.animatePieChart.toggle()
+                
+                
+            }
+            getPieChartData()
+        }
+        
+    }
+    
+    
+    
+    private var legend: some View {
+        Rectangle()
+            .stroke(SECONDARY_ACCENT, lineWidth: 3)
+            .overlay(
+                HStack{
+                    //First Column
+                    VStack{
+            
+                        HStack{
+                            Rectangle().frame(width: 10, height: 10)
+                                .foregroundColor(transportationColor)
+                            Text("Transportation: ").font(.system(size: 14))
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Spacer().frame(height: 15)
+                        
+                        HStack{
+                            Rectangle().frame(width: 10, height: 10)
+                                .foregroundColor(restaurantsColor)
+                            Text("Restaurant/Cafe: ").font(.system(size: 14))
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Spacer().frame(height: 15)
+                        
+                        HStack{
+                            Rectangle().frame(width: 10, height: 10)
+                                .foregroundColor(entertainmentColor)
+                            Text("Entertainment: ").font(.system(size: 14))
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        
+                    }.frame(width: 150, alignment: .leading)
+                    
+                    //Second Column
+                    VStack{
+                       
+                        HStack{
+                            Rectangle().frame(width: 10, height: 10)
+                                .foregroundColor(clothesColor)
+                            Text("Clothes: ").font(.system(size: 14))
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Spacer().frame(height: 15)
+                        
+                        HStack{
+                            Rectangle().frame(width: 10, height: 10)
+                                .foregroundColor(groceriesColor)
+                            Text("Groceries: ").font(.system(size: 14))
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Spacer().frame(height: 15)
+                       
+                        HStack{
+                            Rectangle().frame(width: 10, height: 10)
+                                .foregroundColor(otherColor)
+                            Text("Other: ").font(.system(size: 14))
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                       
+                        
+                    }.frame(width: 150, alignment: .trailing)
+                        
+                    
+                   
+                }
+                
+            
+            )
+            .frame(width: 450, height: 100)
+            
+    }
     
 }
 

@@ -32,8 +32,7 @@ struct ShowExpensesView: View {
                                     .frame(maxWidth: .infinity, alignment: .topLeading)
                             }
                             .offset(CGSize(width: 20, height: 0))
-                            
-                            
+
                             VStack{
                                 Text("\(formatToCurrency(price:(vm.expenses[index][1])))") //Cost
                                     .frame(maxWidth: .infinity, alignment: .topTrailing)

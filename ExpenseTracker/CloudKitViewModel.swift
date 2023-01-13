@@ -190,7 +190,7 @@ class CloudKitViewModel: ObservableObject{
                     //Updates the values in importantDataPoints
                 
                     
-                importantDataPoints[monthAndYear]?.totalCosts = expenseCostValue
+                importantDataPoints[monthAndYear]?.totalCosts += expenseCostValue
                     
                     switch genreFetch {
                         case "Transportation/gas":
@@ -232,11 +232,8 @@ class CloudKitViewModel: ObservableObject{
             
             self?.monthlyDataPoints = importantDataPoints
             self?.monthlyDataPointsChart = sortedDashboardMonthlyData
-            
         }
-        
         addOperations(operation: queryOperation)
-        
     }
     
 }
