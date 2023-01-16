@@ -32,12 +32,20 @@ struct ShowDetailedCategoriesView: View {
     @State var otherEnd: Double = 360
     
     //Legend data
-    @State var transportationPercentage: Double = 0
-    @State var restaurantPercentage: Double = 0
-    @State var entertainmentPercentage: Double = 0
-    @State var clothesPercentage: Double = 0
-    @State var groceriesPercentage: Double = 0
-    @State var otherPercentage: Double = 0
+    @State var showPercentage: Bool = false
+    @State var transportationTotalAngle: Double = 0
+    @State var restaurantTotalAngle: Double = 0
+    @State var entertainmentTotalAngle: Double = 0
+    @State var clothesTotalAngle: Double = 0
+    @State var groceriesTotalAngle: Double = 0
+    @State var otherTotalAngle: Double = 0
+    
+    @State var transportationTotal: Double = 0
+    @State var restaurantTotal: Double = 0
+    @State var entertainmentTotal: Double = 0
+    @State var clothesTotal: Double = 0
+    @State var groceriesTotal: Double = 0
+    @State var otherTotal: Double = 0
     
     //Colors of the pie chart and their genre
     let transportationColor = Color(red: 0.04, green: 0.85, blue: 0.84)
@@ -47,7 +55,6 @@ struct ShowDetailedCategoriesView: View {
     let groceriesColor = Color(red: 1.0, green: 0.00, blue: 0.00)
     let otherColor = Color(red: 0.67, green: 0.00, blue: 1.00)
     
-   
     
     var body: some View {
         ZStack{
@@ -59,12 +66,19 @@ struct ShowDetailedCategoriesView: View {
                 
                 //chart
                 pieChart
-            
+                
+                //toggle switch for legend
+                Button(action: {
+                    showPercentage.toggle()
+                }){
+                    Text("Show")
+                }
+                
                 //legend
                 legend
                 Spacer()
                 Button(action: {
-                    print(selectedMonthAndYear)
+                    print(showPercentage)
                 }) {
                     Text("tap me")
                 }
@@ -76,63 +90,70 @@ struct ShowDetailedCategoriesView: View {
         }
     }
     
+    /*
+     Function to update the pie chart as well as the data that involves the selectedMonthAndYear
+     */
     func getPieChartData() {
-        var transportationTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryTransportation) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
-        if(transportationTotal.isNaN){
-            transportationTotal = 0
+        transportationTotal = vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryTransportation ?? 0
+        restaurantTotal = vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryRestaurant ?? 0
+        entertainmentTotal = vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryEntertainment ?? 0
+        clothesTotal = vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryClothes ?? 0
+        groceriesTotal = vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryGroceries ?? 0
+        otherTotal = vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryOther ?? 0
+        
+        transportationTotalAngle = ((transportationTotal) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(transportationTotalAngle.isNaN){
+            transportationTotalAngle = 0
         }
         //print("transportationTotal: \(transportationTotal)")
         
-        var restaurantTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryRestaurant) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
-        if(restaurantTotal.isNaN){
-            restaurantTotal = 0
+        restaurantTotalAngle = ((restaurantTotal) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(restaurantTotalAngle.isNaN){
+            restaurantTotalAngle = 0
         }
         //print("restaurantTotal: \(restaurantTotal)")
         
-        var entertainmentTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryEntertainment) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
-        if(entertainmentTotal.isNaN){
-            entertainmentTotal = 0
+        entertainmentTotalAngle = ((entertainmentTotal) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(entertainmentTotalAngle.isNaN){
+            entertainmentTotalAngle = 0
         }
         //print("entertainmentTotal: \(entertainmentTotal)")
         
-        var clothesTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryClothes) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
-        if(clothesTotal.isNaN){
-            clothesTotal = 0
+        clothesTotalAngle = ((clothesTotal) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(clothesTotalAngle.isNaN){
+            clothesTotalAngle = 0
         }
         //print("clothesTotal: \(clothesTotal)")
         
-        var groceriesTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryGroceries) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
-        if(groceriesTotal.isNaN){
-            groceriesTotal = 0
+        groceriesTotalAngle = ((groceriesTotal) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(groceriesTotalAngle.isNaN){
+            groceriesTotalAngle = 0
         }
         //print("groceriesTotal: \(groceriesTotal)")
         
-        var otherTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryOther) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
-        if(otherTotal.isNaN){
-            otherTotal = 0
+        otherTotalAngle = ((otherTotal) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(otherTotalAngle.isNaN){
+            otherTotalAngle = 0
         }
         //print("otherTotal: \(otherTotal)")
         
-        transportationEnd = transportationTotal
+        transportationEnd = transportationTotalAngle
         restaurantBeginning = transportationEnd
-        restaurantEnd = transportationTotal + restaurantTotal
+        restaurantEnd = transportationTotalAngle + restaurantTotalAngle
         entertainmentBeginning = restaurantEnd
-        entertainmentEnd = entertainmentBeginning + entertainmentTotal
+        entertainmentEnd = entertainmentBeginning + entertainmentTotalAngle
         clothesBeginning = entertainmentEnd
-        clothesEnd = clothesBeginning + clothesTotal
+        clothesEnd = clothesBeginning + clothesTotalAngle
         groceriesBeginning = clothesEnd
-        groceriesEnd = groceriesBeginning + groceriesTotal
+        groceriesEnd = groceriesBeginning + groceriesTotalAngle
         otherBeginning = groceriesEnd
-        otherEnd = otherBeginning + otherTotal
+        otherEnd = otherBeginning + otherTotalAngle
         
-        transportationPercentage = transportationTotal/360*100
-        restaurantPercentage = restaurantTotal/360*100
-        entertainmentPercentage = entertainmentTotal/360*100
-        clothesPercentage = clothesTotal/360*100
-        groceriesPercentage = groceriesTotal/360*100
-        otherPercentage = otherTotal/360*100
+
     }
-    
+    /*
+     Function that increments the selected month by month
+     */
     func incrementMonth() {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM-yyyy"
@@ -163,9 +184,22 @@ struct ShowDetailedCategoriesView: View {
         print("\(date) converted to \(selectedMonthAndYear)")
         getPieChartData()
     }
+    
+    func checkToggleStateToShow(totalAngle: Double, realTotal: Double) -> String{
+        
+        if (showPercentage == true){
+            let result: Double = totalAngle/360*100
+            return String(formatDoubleToPercentage(result))
+        }
+        else{
+            return formatToCurrency(price: String(realTotal))
+        }
+    }
 }
 
-
+/*
+ --------------------------------------------------------------------------------------
+ */
 extension ShowDetailedCategoriesView {
     private var backdrop: some View {
         PRIMARY_ACCENT
@@ -241,7 +275,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(transportationColor)
-                            Text("Transportation: \(formatDoubleToPercentage(transportationPercentage))").font(.system(size: 14))
+                            Text("Transportation: \(checkToggleStateToShow(totalAngle: transportationTotalAngle, realTotal: transportationTotal))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -249,7 +283,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(restaurantsColor)
-                            Text("Restaurant/Cafe: \(formatDoubleToPercentage(restaurantPercentage))").font(.system(size: 14))
+                            Text("Restaurant/Cafe: \(checkToggleStateToShow(totalAngle: restaurantTotalAngle, realTotal: restaurantTotal))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -257,18 +291,18 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(entertainmentColor)
-                            Text("Entertainment: \(formatDoubleToPercentage(entertainmentPercentage))").font(.system(size: 14))
+                            Text("Entertainment: \(checkToggleStateToShow(totalAngle: entertainmentTotalAngle, realTotal: entertainmentTotal))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
-                    }.frame(width: 150, alignment: .leading)
-                    
+                    }//.frame(width: 170, alignment: .leading)
+                    .padding([.leading], 25)
                     //Second Column
                     VStack{
                        
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(clothesColor)
-                            Text("Clothes: \(formatDoubleToPercentage(clothesPercentage))").font(.system(size: 14))
+                            Text("Clothes: \(checkToggleStateToShow(totalAngle: clothesTotalAngle, realTotal: clothesTotal))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -276,7 +310,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(groceriesColor)
-                            Text("Groceries: \(formatDoubleToPercentage(groceriesPercentage))").font(.system(size: 14))
+                            Text("Groceries: \(checkToggleStateToShow(totalAngle: groceriesTotalAngle, realTotal: groceriesTotal))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -284,12 +318,12 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(otherColor)
-                            Text("Other: \(formatDoubleToPercentage(otherPercentage))").font(.system(size: 14))
+                            Text("Other: \(checkToggleStateToShow(totalAngle: otherTotalAngle, realTotal: otherTotal))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                        
                         
-                    }.frame(width: 150, alignment: .trailing)
-                        
+                    }//.frame(width: 170, alignment: .trailing).padding(.leading, 30)
+                    .padding([.leading], 50)
                     
                    
                 }
@@ -302,7 +336,9 @@ extension ShowDetailedCategoriesView {
     
 }
 
-
+/*
+ --------------------------------------------------------------------------------------
+ */
 
 struct PieChart: Shape {
     var startAngle: Angle
