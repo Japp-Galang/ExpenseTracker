@@ -65,8 +65,9 @@ class CloudKitViewModel: ObservableObject{
         newExpense["ExpenseCost"] = expenseCostValue
         newExpense["Date"] = date
         newExpense["Genre"] = selection
-        
         saveItem(record: newExpense)
+        
+        
     }
     
     private func saveItem(record: CKRecord){
@@ -232,6 +233,7 @@ class CloudKitViewModel: ObservableObject{
             
             self?.monthlyDataPoints = importantDataPoints
             self?.monthlyDataPointsChart = sortedDashboardMonthlyData
+            print(sortedDashboardMonthlyData)
         }
         addOperations(operation: queryOperation)
     }

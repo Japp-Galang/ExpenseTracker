@@ -12,11 +12,10 @@ struct ShowDetailedCategoriesView: View {
     @Binding var vm: CloudKitViewModel
     
     //animatinos
-    @State private var animatePieChart = false
-    
+    @State var animatePieChart = false
     
     //Current Month and Year
-    @State private var selectedMonthAndYear = formatToMonthAndYear(formatDate: Date())
+    @State var selectedMonthAndYear = formatToFullMonthAndYear(formatDate: firstDayOfMonth(date: Date()))
     
     //Pie chart data
     @State var transportationBegininning: Double = 0
@@ -32,6 +31,13 @@ struct ShowDetailedCategoriesView: View {
     @State var otherBeginning: Double = 300
     @State var otherEnd: Double = 360
     
+    //Legend data
+    @State var transportationPercentage: Double = 0
+    @State var restaurantPercentage: Double = 0
+    @State var entertainmentPercentage: Double = 0
+    @State var clothesPercentage: Double = 0
+    @State var groceriesPercentage: Double = 0
+    @State var otherPercentage: Double = 0
     
     //Colors of the pie chart and their genre
     let transportationColor = Color(red: 0.04, green: 0.85, blue: 0.84)
@@ -57,6 +63,11 @@ struct ShowDetailedCategoriesView: View {
                 //legend
                 legend
                 Spacer()
+                Button(action: {
+                    print(selectedMonthAndYear)
+                }) {
+                    Text("tap me")
+                }
             }
             .navigationBarTitle("Category Details")
                 .font(.title)
@@ -66,18 +77,41 @@ struct ShowDetailedCategoriesView: View {
     }
     
     func getPieChartData() {
-        let transportationTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryTransportation ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
-        print("transportationTotal: \(transportationTotal)")
-        let restaurantTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryRestaurant ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
-        print("restaurantTotal: \(restaurantTotal)")
-        let entertainmentTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryEntertainment ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
-        print("entertainmentTotal: \(entertainmentTotal)")
-        let clothesTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryClothes ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
-        print("clothesTotal: \(clothesTotal)")
-        let groceriesTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryGroceries ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
-        print("groceriesTotal: \(groceriesTotal)")
-        let otherTotal: Double = ((vm.monthlyDataPointsChart.last?.categoryOther ?? 0) / (vm.monthlyDataPointsChart.last?.totalCosts ?? 1)) * 360
-        print("otherTotal: \(otherTotal)")
+        var transportationTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryTransportation) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(transportationTotal.isNaN){
+            transportationTotal = 0
+        }
+        //print("transportationTotal: \(transportationTotal)")
+        
+        var restaurantTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryRestaurant) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(restaurantTotal.isNaN){
+            restaurantTotal = 0
+        }
+        //print("restaurantTotal: \(restaurantTotal)")
+        
+        var entertainmentTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryEntertainment) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(entertainmentTotal.isNaN){
+            entertainmentTotal = 0
+        }
+        //print("entertainmentTotal: \(entertainmentTotal)")
+        
+        var clothesTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryClothes) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(clothesTotal.isNaN){
+            clothesTotal = 0
+        }
+        //print("clothesTotal: \(clothesTotal)")
+        
+        var groceriesTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryGroceries) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(groceriesTotal.isNaN){
+            groceriesTotal = 0
+        }
+        //print("groceriesTotal: \(groceriesTotal)")
+        
+        var otherTotal: Double = (((vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.categoryOther) ?? 0) / (vm.monthlyDataPointsChart.first(where: { $0.monthAndYear == formatToMonthAndYear(formateDate: selectedMonthAndYear)})?.totalCosts ?? 1)) * 360
+        if(otherTotal.isNaN){
+            otherTotal = 0
+        }
+        //print("otherTotal: \(otherTotal)")
         
         transportationEnd = transportationTotal
         restaurantBeginning = transportationEnd
@@ -91,7 +125,43 @@ struct ShowDetailedCategoriesView: View {
         otherBeginning = groceriesEnd
         otherEnd = otherBeginning + otherTotal
         
+        transportationPercentage = transportationTotal/360*100
+        restaurantPercentage = restaurantTotal/360*100
+        entertainmentPercentage = entertainmentTotal/360*100
+        clothesPercentage = clothesTotal/360*100
+        groceriesPercentage = groceriesTotal/360*100
+        otherPercentage = otherTotal/360*100
+    }
+    
+    func incrementMonth() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM-yyyy"
+
+        var date = formatter.date(from: selectedMonthAndYear)!
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(abbreviation: "EST")!
         
+       
+        date = calendar.date(byAdding: .month, value: 1, to: date)!
+        
+
+        selectedMonthAndYear = formatter.string(from: date)
+        print("\(date) converted to \(selectedMonthAndYear)")
+        getPieChartData()
+    }
+    
+    func decrementMonth() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM-yyyy"
+
+        var date = formatter.date(from: selectedMonthAndYear)!
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(abbreviation: "EST")!
+        
+        date = calendar.date(byAdding: .month, value: -1, to: date)!
+        selectedMonthAndYear = formatter.string(from: date)
+        print("\(date) converted to \(selectedMonthAndYear)")
+        getPieChartData()
     }
 }
 
@@ -105,7 +175,7 @@ extension ShowDetailedCategoriesView {
     private var header: some View {
         HStack{
             Button(action: {
-                print("asdf")
+                decrementMonth()
             }){
                 RoundedRectangle(cornerRadius: 10).frame(width: 100, height: 40)
                     .foregroundColor(SECONDARY_ACCENT)
@@ -113,9 +183,11 @@ extension ShowDetailedCategoriesView {
                         Image(systemName: "arrowshape.left")
                     )
             }
+            
             Text(selectedMonthAndYear)
+            
             Button(action: {
-                print("asdf")
+                incrementMonth()
             }){
                 RoundedRectangle(cornerRadius: 10).frame(width: 100, height: 40)
                     .foregroundColor(SECONDARY_ACCENT)
@@ -166,11 +238,10 @@ extension ShowDetailedCategoriesView {
                 HStack{
                     //First Column
                     VStack{
-            
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(transportationColor)
-                            Text("Transportation: ").font(.system(size: 14))
+                            Text("Transportation: \(formatDoubleToPercentage(transportationPercentage))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -178,7 +249,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(restaurantsColor)
-                            Text("Restaurant/Cafe: ").font(.system(size: 14))
+                            Text("Restaurant/Cafe: \(formatDoubleToPercentage(restaurantPercentage))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -186,7 +257,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(entertainmentColor)
-                            Text("Entertainment: ").font(.system(size: 14))
+                            Text("Entertainment: \(formatDoubleToPercentage(entertainmentPercentage))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                     }.frame(width: 150, alignment: .leading)
@@ -197,7 +268,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(clothesColor)
-                            Text("Clothes: ").font(.system(size: 14))
+                            Text("Clothes: \(formatDoubleToPercentage(clothesPercentage))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -205,7 +276,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(groceriesColor)
-                            Text("Groceries: ").font(.system(size: 14))
+                            Text("Groceries: \(formatDoubleToPercentage(groceriesPercentage))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                         
                         Spacer().frame(height: 15)
@@ -213,7 +284,7 @@ extension ShowDetailedCategoriesView {
                         HStack{
                             Rectangle().frame(width: 10, height: 10)
                                 .foregroundColor(otherColor)
-                            Text("Other: ").font(.system(size: 14))
+                            Text("Other: \(formatDoubleToPercentage(otherPercentage))").font(.system(size: 14))
                         }.frame(maxWidth: .infinity, alignment: .leading)
                        
                         
@@ -230,6 +301,8 @@ extension ShowDetailedCategoriesView {
     }
     
 }
+
+
 
 struct PieChart: Shape {
     var startAngle: Angle
@@ -263,13 +336,51 @@ struct PieChart: Shape {
 /*
  Function to format a date from the format mm-yyyy to MMMM yyyy
  */
-func formatToMonthAndYear(formatDate: Date) -> String {
+func formatToFullMonthAndYear(formatDate: Date) -> String {
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "MMMM yyyy"
+    dateFormatter.dateFormat = "MMMM-yyyy"
     let monthName = dateFormatter.string(from: formatDate)
     
     return monthName
 }
+
+/*
+ Function to format a date from the format MMMM to mm-yyyy
+ */
+func formatToMonthAndYear(formateDate: String) -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "MMMM-yyyy"
+    let date = formatter.date(from: formateDate)!
+
+    formatter.dateFormat = "MM-yyyy"
+    return formatter.string(from: date)
+    
+}
+
+/*
+ Function to format a double (.56) to a percentage (56%)
+ */
+func formatDoubleToPercentage(_ value: Double) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .percent
+    formatter.maximumFractionDigits = 2
+    formatter.minimumIntegerDigits = 1
+    formatter.multiplier = 1
+    let formattedValue = formatter.string(from: NSNumber(value: value))
+    return formattedValue!
+}
+
+
+/*
+ Function to return the first day of a month
+ */
+func firstDayOfMonth(date: Date) -> Date {
+    let calendar = Calendar.current
+    let components = calendar.dateComponents([.year, .month], from: date)
+    let firstDayOfMonth = calendar.date(from: components)
+    return firstDayOfMonth!
+}
+
 
 
 struct ShowDetailedCategoriesView_Previews: PreviewProvider {
