@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DD00AB132977B5E200209952 /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD00AB122977B5E200209952 /* ChartsView.swift */; };
 		DDDA8CE7296E105200AC710B /* ShowDetailedCategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDA8CE6296E105200AC710B /* ShowDetailedCategoriesView.swift */; };
 		DDDFE2A02960EE9B008E5C41 /* ExpenseTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDFE29F2960EE9B008E5C41 /* ExpenseTrackerApp.swift */; };
 		DDDFE2A42960EE9C008E5C41 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DDDFE2A32960EE9C008E5C41 /* Assets.xcassets */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DD00AB122977B5E200209952 /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
 		DDDA8CE6296E105200AC710B /* ShowDetailedCategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDetailedCategoriesView.swift; sourceTree = "<group>"; };
 		DDDFE29C2960EE9B008E5C41 /* ExpenseTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExpenseTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDDFE29F2960EE9B008E5C41 /* ExpenseTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseTrackerApp.swift; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				DDDA8CE6296E105200AC710B /* ShowDetailedCategoriesView.swift */,
 				DDDFE2A32960EE9C008E5C41 /* Assets.xcassets */,
 				DDDFE2A52960EE9C008E5C41 /* Preview Content */,
+				DD00AB122977B5E200209952 /* ChartsView.swift */,
 			);
 			path = ExpenseTracker;
 			sourceTree = "<group>";
@@ -151,6 +154,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD00AB132977B5E200209952 /* ChartsView.swift in Sources */,
 				DDDFE2B02960F21D008E5C41 /* DashboardView.swift in Sources */,
 				DDDFE2A02960EE9B008E5C41 /* ExpenseTrackerApp.swift in Sources */,
 				DDDFE2B42960F2C1008E5C41 /* ShowExpensesView.swift in Sources */,

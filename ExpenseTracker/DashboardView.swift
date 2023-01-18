@@ -85,29 +85,34 @@ extension DashboardView {
     }
     
     private var monthlyExpensesPastMonths: some View{
-        Rectangle()
-            .fill(SECONDARY_ACCENT)
-            .overlay(
-                VStack{
-                    Text("Monthly Expenses for the past 6 months")
-                        .font(.title3)
-                        .padding([.top], 20)
-                        .foregroundColor(TEXT_COLOR)
-                    
-                    Chart(vm.monthlyDataPointsChart) { item in
-                        BarMark(
-                            x: .value("Month&Year", item.monthAndYear),
-                            y: .value("TotalExpenses", item.totalCosts)
-                        )
-                        .foregroundStyle(Color.black.gradient)
-                        .cornerRadius(5)
+        NavigationLink(destination: ChartsView(), label: {
+            
+            Rectangle()
+                .fill(SECONDARY_ACCENT)
+                .overlay(
+                    VStack{
+                        Text("Monthly Expenses for the past 6 months")
+                            .font(.title3)
+                            .padding([.top], 20)
+                            .foregroundColor(TEXT_COLOR)
+                        
+                        Chart(vm.monthlyDataPointsChart) { item in
+                            BarMark(
+                                x: .value("Month&Year", item.monthAndYear),
+                                y: .value("TotalExpenses", item.totalCosts)
+                            )
+                            .foregroundStyle(Color.black.gradient)
+                            .cornerRadius(5)
+                        }
+                        .padding(10)
                     }
-                    .padding(10)
-                }
-                
-            )
-            .cornerRadius(15)
-            .padding([.leading, .trailing], 15)
+                    
+                )
+                .cornerRadius(15)
+                .padding([.leading, .trailing], 15)
+            
+        })
+        
     }
 
     private var showAllExpenses: some View{

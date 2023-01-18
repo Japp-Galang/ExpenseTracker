@@ -14,9 +14,10 @@ import Charts
 struct ShowExpensesView: View {
     
     @Binding var vm: CloudKitViewModel
-    @State private var selectedYear = 2023
-    @State private var selectedMonth = "January"
-    @State private var date: Date = Date()
+    @State private var selectedYear = currentYear()
+    @State private var selectedMonth = currentMonth()
+    
+    
     let months = ["January"
                   ,"February"
                   ,"March"
@@ -32,10 +33,9 @@ struct ShowExpensesView: View {
     
     let years = Array(2000...2500)
 
-    var yearAndMonth: String {
-        let result = String(selectedMonth) + "-" + String(selectedYear)
-        return String(result)
-    }
+    @State var yearAndMonth: String = currentMonth() + "-" + String(currentYear())
+    
+    @State var selectedQuery: [[String]] = []
     
     var body: some View {
         NavigationView{
@@ -48,8 +48,7 @@ struct ShowExpensesView: View {
                         Text("Expenses")
                             .underline()
                             .font(.title)
-                            .offset(CGSize(width: 20, height: 0))
-                            .padding([.top, .bottom], 15)
+                            .padding([.bottom], 15)
                        
                         HStack{
                             Picker("select year", selection: $selectedYear){
@@ -62,10 +61,13 @@ struct ShowExpensesView: View {
                                 .clipped()
                             Picker("select month", selection: $selectedMonth) {
                                 ForEach(months, id: \.self) { month in
-                                    Text(month)
+                                    Text(month).tag(month)
                                 }
                             }
                                 .pickerStyle(WheelPickerStyle())
+                                .onReceive([selectedMonth].publisher.first()) { (value) in
+                                            selectedMonth = value
+                                        }
                                 .frame(width: 200, height: 200)
                                 .clipped()
                         }
@@ -73,31 +75,31 @@ struct ShowExpensesView: View {
                             
                         //TEST
                         Button{
+                            refreshExpensesList()
                             print(yearAndMonth)
+                            
                         } label: {
                             Text("TEST")
                         }
                         columnNames
                         
-                        ForEach(0..<vm.expenses.count){index in
+                        ForEach(selectedQuery, id:\.self) {item in
                             HStack{
                                 VStack{
-                                    Text("\(vm.expenses[index][0])") //Name
+                                    Text("\(item[0])") //Name
                                         .frame(maxWidth: .infinity, alignment: .topLeading)
-                                    Text("\(vm.expenses[index][2])") //Date
+                                    Text("\(item[2])") //Date
                                         .frame(maxWidth: .infinity, alignment: .topLeading)
                                 }
                                 .offset(CGSize(width: 20, height: 0))
 
                                 VStack{
-                                    Text("\(formatToCurrency(price:(vm.expenses[index][1])))") //Cost
+                                    Text("\(formatToCurrency(price:(item[1])))") //Cost
                                         .frame(maxWidth: .infinity, alignment: .topTrailing)
-                                    Text("\(vm.expenses[index][3])") //Genre
+                                    Text("\(item[3])") //Genre
                                         .italic()
                                         .frame(maxWidth: .infinity, alignment: .topTrailing)
                                 }
-                                
-                                
                                 .offset(CGSize(width: -20, height: 0))
                             }
                             
@@ -111,6 +113,28 @@ struct ShowExpensesView: View {
                 
             }
         }
+        
+        
+    }
+    
+    func refreshExpensesList() {
+        yearAndMonth = selectedMonth + "-" + String(selectedYear)
+        var result: [[String]] = []
+        
+        for item in vm.expenses {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            let dateOfRecord = dateFormatter.date(from: item[2])!
+            dateFormatter.dateFormat = "MMMM-yyyy"
+            
+            let formattedDateRecord = dateFormatter.string(from: dateOfRecord)
+            
+            if(String(formattedDateRecord) == yearAndMonth){
+                result.append(item)
+            }
+        }
+         selectedQuery = result
+       
     }
 }
 
@@ -143,9 +167,27 @@ extension ShowExpensesView {
 
 
 func formatToCurrency(price: String) -> String{
-    var formatThis = Double(price) ?? 0
+    let formatThis = Double(price) ?? 0
     return String(format: "$%.02f", formatThis)
     
+}
+
+
+
+func currentYear() -> Int {
+    let date = Date()
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy"
+    return Int(dateFormatter.string(from: date))!
+}
+
+
+
+func currentMonth() -> String {
+    let date = Date()
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MMMM"
+    return dateFormatter.string(from: date)
 }
 
 
