@@ -11,7 +11,7 @@ let TEXT_COLOR =  Color(red: 1.0, green: 1.0, blue: 1.0)
 struct DashboardView: View {
    
     
-    @StateObject private var vm = CloudKitViewModel()
+    @StateObject var vm = CloudKitViewModel()
     
     @State var showingCategories = false
     
@@ -22,40 +22,53 @@ struct DashboardView: View {
             ZStack{
                 backdrop
                 VStack{
-                    //top section
-                    header
-                    Spacer()
-                    //Text("IS SIGNED IN: \(vm.isSignedInToiCloud.description.uppercased())")
-                    //Text(vm.error)
-                    featuredData
-                    monthlyExpensesPastMonths
                     
-                    Spacer().frame(height: 15)
-                    //mid section
-                    HStack{
-                        VStack{
-                            showAllExpenses
+                        //top section
+                        header
+                        Spacer()
+                        //Text("IS SIGNED IN: \(vm.isSignedInToiCloud.description.uppercased())")
+                        //Text(vm.error)
+                        featuredData
+                        monthlyExpensesPastMonths
+                        
+                        Spacer().frame(height: 15)
+                        //mid section
+                        HStack{
+                            VStack{
+                                showAllExpenses
+                            }
+                            showCategories
                         }
-                        showCategories
-                    }
+                        
+                        Spacer().frame(height: 25)
                     
-                    Spacer().frame(height: 25)
+                        
+                     
                     //bottom section
                     addNewExpense
+                    }
+                    
                 
-                }
+                
             }
             .navigationBarHidden(true)
         }
         
     }
+    
+    
 }
 
 extension DashboardView {
     
     private var backdrop: some View {
+        /*
+        LinearGradient(colors: [.blue, .black, .black], startPoint: .topLeading, endPoint: .bottomTrailing)
+            .edgesIgnoringSafeArea(.all)
+         */
         PRIMARY_ACCENT
             .ignoresSafeArea()
+         
     }
     
     
@@ -85,7 +98,7 @@ extension DashboardView {
     }
     
     private var monthlyExpensesPastMonths: some View{
-        NavigationLink(destination: ChartsView(), label: {
+        NavigationLink(destination: ChartsView(vm: .constant(CloudKitViewModel())), label: {
             
             Rectangle()
                 .fill(SECONDARY_ACCENT)
@@ -108,9 +121,14 @@ extension DashboardView {
                     }
                     
                 )
+                .onAppear{
+                    vm.fetchItems()
+                    vm.fillImportantData()
+                }
                 .cornerRadius(15)
                 .padding([.leading, .trailing], 15)
-            
+                
+                
         })
         
     }

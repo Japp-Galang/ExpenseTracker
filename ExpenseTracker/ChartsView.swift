@@ -8,13 +8,25 @@
 import SwiftUI
 
 struct ChartsView: View {
+    
+    @Binding var vm: CloudKitViewModel
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        NavigationView{
+            ZStack{
+                VStack{
+                    Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+                }
+            }
+            
+        }
+        
     }
 }
 
 struct ChartsView_Previews: PreviewProvider {
     static var previews: some View {
-        ChartsView()
+        ChartsView(vm: .constant(CloudKitViewModel()))
     }
 }

@@ -81,6 +81,7 @@ struct ShowExpensesView: View {
                         } label: {
                             Text("TEST")
                         }
+                        
                         columnNames
                         
                         ForEach(selectedQuery, id:\.self) {item in

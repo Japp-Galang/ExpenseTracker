@@ -39,6 +39,7 @@ struct AddExpenseView: View {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button{
                         vm.saveFormPressed()
+                        
                     }
                     label: {
                         Text("Save")

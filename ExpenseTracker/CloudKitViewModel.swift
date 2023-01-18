@@ -68,6 +68,7 @@ class CloudKitViewModel: ObservableObject{
         saveItem(record: newExpense)
         
         
+        
     }
     
     private func saveItem(record: CKRecord){
@@ -81,7 +82,9 @@ class CloudKitViewModel: ObservableObject{
                 self?.expenseCostValue      = nil               //doesn't work
                 self?.selection             = "Genre Select"
             }
+            
         }
+        
     }
     
 //--------------------------------//
