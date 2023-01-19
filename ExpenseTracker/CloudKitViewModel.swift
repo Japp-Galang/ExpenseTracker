@@ -23,7 +23,7 @@ class CloudKitViewModel: ObservableObject{
     
     init(){
         fetchItems()
-        fillImportantData()
+        fillImportantData(beginningMonthAndYear: "08-2022", endMonthAndYear: "01-2023")
     }
     
     private func getiCloudStatus() {
@@ -135,42 +135,54 @@ class CloudKitViewModel: ObservableObject{
     }
     
 //--------------------------------//
-    func fillImportantData(){
-        var importantDataPoints: [String:MonthlyData] = [:]
+    /*
+     Outputs the data to show. The input format is "mm-yyyy"
+     */
+    func fillImportantData(beginningMonthAndYear: String, endMonthAndYear: String){
+        var importantDataPoints: [String:MonthlyData] = [:]                                        //initialize output
         
         let calendar = Calendar.current
         
-        // Get the current date and month
-        var firstOfThisMonthComponents = calendar.dateComponents([.year, .month], from: Date())
-        firstOfThisMonthComponents.day = 1                                                         // Set the first day of the current month
-
-        // Get the date for the first day of the current month
-        let firstOfMonth = calendar.date(from: firstOfThisMonthComponents)!
-        let firstOfMonthNMonthsAgo = calendar.date(byAdding: .month, value: -5, to: firstOfMonth)
-        let firstOfMonthNMonthsAgoNSDate = firstOfMonthNMonthsAgo! as NSDate
-    
-        // get the last day of current month
-        var lastofMonthComponents = calendar.dateComponents([.year, .month], from: Date())          // Get the current date and month
-        lastofMonthComponents.day = calendar.range(of: .day, in: .month, for: Date())!.count        // Set the day to the last day of the month
-        let lastOfMonth = calendar.date(from: lastofMonthComponents)!                               // Get the date for the last day of the current month
+        //Prepares beginning of query
+        var firstOfBeginningMonthAndYear = DateComponents()
+        firstOfBeginningMonthAndYear.day = 1                                                         // Set the first day of the current month
+        firstOfBeginningMonthAndYear.month = Int(takeSubstring(word: beginningMonthAndYear, beginning: 0, end: -5))
+        firstOfBeginningMonthAndYear.year = Int(takeSubstring(word: beginningMonthAndYear, beginning: 3, end: 0))
         
+        var beginning = calendar.date(from: firstOfBeginningMonthAndYear)
+        let beginningNSDate = beginning! as NSDate
+        
+        
+        
+        //Prepares end of query
+        var lastOfEndMonthAndYear = DateComponents()
+        lastOfEndMonthAndYear.day = 1                                                         // Set the first day of the current month
+        lastOfEndMonthAndYear.month = Int(takeSubstring(word: endMonthAndYear, beginning: 0, end: -5))
+        lastOfEndMonthAndYear.year = Int(takeSubstring(word: endMonthAndYear, beginning: 3, end: 0))
+        
+        let end = calendar.date(from: lastOfEndMonthAndYear)
+        let endNSDate = end! as NSDate
+        
+        
+       
+        print(beginningNSDate)
         
         //Querying the data to get data points of the last n months
-        let predicate = NSPredicate(format: "Date > %@", firstOfMonthNMonthsAgoNSDate)
+        let predicate = NSPredicate(format: "Date > %@", beginningNSDate)
         let query = CKQuery(recordType: "Expense", predicate: predicate)
         let queryOperation = CKQueryOperation(query: query)
     //----------------------------------------
-        //Prefill output with the needed YYYY-MM
+        //Prefill output with the needed MM-YYYY
         let calendar2 = Calendar.current
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM-YYYY"
 
         
-        var date = firstOfMonthNMonthsAgo
-        while date! <= lastOfMonth {
-            let monthAndYear = dateFormatter.string(from: date!)
+        
+        while beginning! <= end! {
+            let monthAndYear = dateFormatter.string(from: beginning!)
             importantDataPoints[monthAndYear] = MonthlyData(monthAndYear: monthAndYear, totalCosts: 0, categoryTransportation: 0, categoryRestaurant: 0, categoryClothes: 0, categoryEntertainment: 0, categoryGroceries: 0, categoryOther: 0)
-            date = calendar2.date(byAdding: .month, value: 1, to: date!)!
+            beginning = calendar2.date(byAdding: .month, value: 1, to: beginning!)!
             
         }
         

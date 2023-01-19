@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct ChartsView: View {
     
@@ -16,7 +17,23 @@ struct ChartsView: View {
         NavigationView{
             ZStack{
                 VStack{
-                    Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+                    Text("Monthly Expenses for the past 6 months")
+                        .font(.title3)
+                        .padding([.top], 20)
+                        .foregroundColor(TEXT_COLOR)
+                    
+                    Chart(vm.monthlyDataPointsChart) { item in
+                        BarMark(
+                            x: .value("Month&Year", item.monthAndYear),
+                            y: .value("TotalExpenses", item.totalCosts)
+                        )
+                        .foregroundStyle(Color.black.gradient)
+                        .cornerRadius(5)
+                    }
+                    .frame(height: 400)
+                    .padding(10)
+                    
+                    Spacer()
                 }
             }
             

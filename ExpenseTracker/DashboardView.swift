@@ -119,16 +119,13 @@ extension DashboardView {
                         }
                         .padding(10)
                     }
-                    
                 )
                 .onAppear{
                     vm.fetchItems()
-                    vm.fillImportantData()
+                    vm.fillImportantData(beginningMonthAndYear: "04-2022", endMonthAndYear: "12-2022")
                 }
                 .cornerRadius(15)
                 .padding([.leading, .trailing], 15)
-                
-                
         })
         
     }

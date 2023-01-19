@@ -167,7 +167,7 @@ struct ShowDetailedCategoriesView: View {
         
 
         selectedMonthAndYear = formatter.string(from: date)
-        print("\(date) converted to \(selectedMonthAndYear)")
+        
         getPieChartData()
     }
     
@@ -181,7 +181,7 @@ struct ShowDetailedCategoriesView: View {
         
         date = calendar.date(byAdding: .month, value: -1, to: date)!
         selectedMonthAndYear = formatter.string(from: date)
-        print("\(date) converted to \(selectedMonthAndYear)")
+     
         getPieChartData()
     }
     
