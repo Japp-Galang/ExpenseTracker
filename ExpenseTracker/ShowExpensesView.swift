@@ -15,7 +15,7 @@ struct ShowExpensesView: View {
     
     @Binding var vm: CloudKitViewModel
     @State private var selectedYear = currentYear()
-    @State private var selectedMonth = currentMonth()
+    @State private var selectedMonth = currentMonthMMMM()
     
     
     let months = ["January"
@@ -33,7 +33,7 @@ struct ShowExpensesView: View {
     
     let years = Array(2000...2500)
 
-    @State var yearAndMonth: String = currentMonth() + "-" + String(currentYear())
+    @State var yearAndMonth: String = currentMonthMMMM() + "-" + String(currentYear())
     
     @State var selectedQuery: [[String]] = []
     
@@ -167,6 +167,8 @@ extension ShowExpensesView {
 }
 
 
+
+
 func formatToCurrency(price: String) -> String{
     let formatThis = Double(price) ?? 0
     return String(format: "$%.02f", formatThis)
@@ -184,12 +186,43 @@ func currentYear() -> Int {
 
 
 
-func currentMonth() -> String {
+func currentMonthMMMM() -> String {
     let date = Date()
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "MMMM"
     return dateFormatter.string(from: date)
 }
+
+
+
+func currentMonthMM() -> String {
+    let calendar = Calendar.current
+    let month = calendar.component(.month, from: Date())
+    return String(format: "%02d", month)
+}
+
+
+
+func fiveMonthsAgo() -> String {
+    let date = Calendar.current.date(byAdding: .month, value: -5, to: Date())!
+    let formatter = DateFormatter()
+    formatter.dateFormat = "MM-yyyy"
+    
+    return formatter.string(from: date)
+}
+
+
+
+func monthName(_ month: String) -> String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MM"
+    guard let date = dateFormatter.date(from: month) else {
+        return "Invalid Month"
+    }
+    dateFormatter.dateFormat = "MMMM"
+    return dateFormatter.string(from: date)
+}
+
 
 
 struct ShowExpensesView_Previews: PreviewProvider {

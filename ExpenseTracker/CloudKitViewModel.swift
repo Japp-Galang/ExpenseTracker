@@ -23,7 +23,8 @@ class CloudKitViewModel: ObservableObject{
     
     init(){
         fetchItems()
-        fillImportantData(beginningMonthAndYear: "08-2022", endMonthAndYear: "01-2023")
+        fillImportantData(beginningMonthAndYear: "08-2022", endMonthAndYear: currentMonthMM() + "-" + String(currentYear()))
+        
     }
     
     private func getiCloudStatus() {
@@ -162,10 +163,7 @@ class CloudKitViewModel: ObservableObject{
         
         let end = calendar.date(from: lastOfEndMonthAndYear)
         let endNSDate = end! as NSDate
-        
-        
-       
-        print(beginningNSDate)
+    
         
         //Querying the data to get data points of the last n months
         let predicate = NSPredicate(format: "Date > %@", beginningNSDate)
@@ -248,7 +246,7 @@ class CloudKitViewModel: ObservableObject{
             
             self?.monthlyDataPoints = importantDataPoints
             self?.monthlyDataPointsChart = sortedDashboardMonthlyData
-            print(sortedDashboardMonthlyData)
+            
         }
         addOperations(operation: queryOperation)
     }

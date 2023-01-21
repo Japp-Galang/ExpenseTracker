@@ -12,6 +12,33 @@ struct ChartsView: View {
     
     @Binding var vm: CloudKitViewModel
     
+    
+    
+    @State private var selectedYearBeginning = Int(takeSubstring(word: fiveMonthsAgo(), beginning: 3, end: 0))!
+    @State private var selectedMonthBeginning = monthName(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5))
+    @State var beginningMonthAndYear: String = String(monthName(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5))) + "-" + String(takeSubstring(word: fiveMonthsAgo(), beginning: 3, end: 0))
+        
+    
+    @State private var selectedYearEnd = currentYear()
+    @State private var selectedMonthEnd = currentMonthMM()
+    @State var endMonthAndYear: String = String(currentMonthMM()) + "-" + String(currentYear())
+    
+    
+    let months = ["January"
+                  ,"February"
+                  ,"March"
+                  ,"April"
+                  ,"May"
+                  ,"June"
+                  ,"July"
+                  ,"August"
+                  ,"September"
+                  ,"October"
+                  ,"November"
+                  ,"December"]
+    
+    let years = Array(2000...2500)
+    
     var body: some View {
         
         NavigationView{
@@ -33,6 +60,63 @@ struct ChartsView: View {
                     .frame(height: 400)
                     .padding(10)
                     
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(SECONDARY_ACCENT)
+                        .overlay{
+                            VStack{
+                                Text("Choose date range")
+                                
+                                //Beginning Date
+                                
+                                HStack{
+                                    Text("Start")
+                                    Picker("select year", selection: $selectedYearBeginning){
+                                        ForEach(years, id: \.self) { year in
+                                            Text("\(String(year))")
+                                        }
+                                    }
+                                        .clipped()
+                                    Picker("select month", selection: $selectedMonthBeginning) {
+                                        ForEach(months, id: \.self) { month in
+                                            Text(month).tag(month)
+                                        }
+                                    }
+                                        .onReceive([selectedMonthBeginning].publisher.first()) { (value) in
+                                                    selectedMonthBeginning = value
+                                                }
+                                        .clipped()
+                                }
+                                
+                                //End Date
+                                HStack{
+                                    Text("End")
+                                    Picker("select year", selection: $selectedYearEnd){
+                                        ForEach(years, id: \.self) { year in
+                                            Text("\(String(year))")
+                                        }
+                                    }
+                                        .clipped()
+                                    Picker("select month", selection: $selectedMonthEnd) {
+                                        ForEach(months, id: \.self) { month in
+                                            Text(month).tag(month)
+                                        }
+                                    }
+                                        .onReceive([selectedMonthEnd].publisher.first()) { (value) in
+                                                    selectedMonthEnd = value
+                                                }
+                                        .clipped()
+                                }
+                                
+                                
+                                //TEST
+                                Button{
+                                    vm.fillImportantData(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
+                                }
+                                label:{
+                                    Text("GO")
+                                }
+                            }
+                        }
                     Spacer()
                 }
             }

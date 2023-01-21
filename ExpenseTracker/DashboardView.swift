@@ -121,13 +121,11 @@ extension DashboardView {
                     }
                 )
                 .onAppear{
-                    vm.fetchItems()
-                    vm.fillImportantData(beginningMonthAndYear: "04-2022", endMonthAndYear: "12-2022")
+                    vm.fillImportantData(beginningMonthAndYear: fiveMonthsAgo(), endMonthAndYear: currentMonthMM() + "-" + String(currentYear()))
                 }
                 .cornerRadius(15)
                 .padding([.leading, .trailing], 15)
         })
-        
     }
 
     private var showAllExpenses: some View{
@@ -148,9 +146,6 @@ extension DashboardView {
         
                 .frame(maxWidth: 130, maxHeight: .infinity, alignment: .topLeading)
         })
-        
-            
-        
     }
     
     private var showCategories: some View{
