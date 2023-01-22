@@ -12,16 +12,17 @@ struct ChartsView: View {
     
     @Binding var vm: CloudKitViewModel
     
-    
-    
-    @State private var selectedYearBeginning = Int(takeSubstring(word: fiveMonthsAgo(), beginning: 3, end: 0))!
-    @State private var selectedMonthBeginning = monthName(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5))
-    @State var beginningMonthAndYear: String = String(monthName(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5))) + "-" + String(takeSubstring(word: fiveMonthsAgo(), beginning: 3, end: 0))
+    @State var selectedYearBeginning = Int(takeSubstring(word: fiveMonthsAgo(), beginning: 3, end: 0))!
+    @State var selectedMonthBeginning = monthName(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5))
+    @State var beginningMonthAndYear: String = String(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5)) + "-" + String(takeSubstring(word: fiveMonthsAgo(), beginning: 3, end: 0))
         
     
-    @State private var selectedYearEnd = currentYear()
-    @State private var selectedMonthEnd = currentMonthMM()
+    @State var selectedYearEnd = currentYear()
+    @State var selectedMonthEnd = currentMonthMMMM()
     @State var endMonthAndYear: String = String(currentMonthMM()) + "-" + String(currentYear())
+    
+    @State var temp_data: [MonthlyData] = []
+    @State var showChartSettings: Bool = false
     
     
     let months = ["January"
@@ -44,22 +45,6 @@ struct ChartsView: View {
         NavigationView{
             ZStack{
                 VStack{
-                    Text("Monthly Expenses for the past 6 months")
-                        .font(.title3)
-                        .padding([.top], 20)
-                        .foregroundColor(TEXT_COLOR)
-                    
-                    Chart(vm.monthlyDataPointsChart) { item in
-                        BarMark(
-                            x: .value("Month&Year", item.monthAndYear),
-                            y: .value("TotalExpenses", item.totalCosts)
-                        )
-                        .foregroundStyle(Color.black.gradient)
-                        .cornerRadius(5)
-                    }
-                    .frame(height: 400)
-                    .padding(10)
-                    
                     RoundedRectangle(cornerRadius: 15)
                         .fill(SECONDARY_ACCENT)
                         .overlay{
@@ -67,7 +52,6 @@ struct ChartsView: View {
                                 Text("Choose date range")
                                 
                                 //Beginning Date
-                                
                                 HStack{
                                     Text("Start")
                                     Picker("select year", selection: $selectedYearBeginning){
@@ -109,19 +93,46 @@ struct ChartsView: View {
                                 
                                 
                                 //TEST
+                                
                                 Button{
-                                    vm.fillImportantData(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
+  
+                                    updateChart()
+                                    showChartSettings.toggle()
+                                    
                                 }
                                 label:{
                                     Text("GO")
                                 }
+                                 
+                                //TEST2
+                                Button{
+                                    temp_data = []
+                                }
+                                label:{
+                                    Text("RESET")
+                                }
+                                
+                                .sheet(isPresented: $showChartSettings){
+                                    DisplayChartView(temp_data: temp_data)
+                                }
                             }
                         }
-                    Spacer()
                 }
             }
             
         }
+        
+    }
+    func updateChart() {
+        
+        beginningMonthAndYear = String(getMonthNumber(from: selectedMonthBeginning) + "-" + String(selectedYearBeginning))
+        
+        endMonthAndYear = String(getMonthNumber(from: selectedMonthEnd) + "-" + String(selectedYearEnd))
+        
+        
+        vm.fillImportantData(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
+         
+        temp_data = vm.monthlyDataPointsChart
         
     }
 }
@@ -129,5 +140,46 @@ struct ChartsView: View {
 struct ChartsView_Previews: PreviewProvider {
     static var previews: some View {
         ChartsView(vm: .constant(CloudKitViewModel()))
+    }
+}
+
+struct DisplayChartView: View {
+    let temp_data: [MonthlyData]
+    
+    
+    init(temp_data: [MonthlyData]) {
+        self.temp_data = temp_data
+        print("//////////////////////")
+        print(temp_data)
+    }
+    var body: some View {
+        VStack{
+            Text("Monthly Expenses for the past n months")
+                .font(.title3)
+                .padding([.top], 20)
+                .foregroundColor(TEXT_COLOR)
+            
+            Chart(temp_data) { item in
+                BarMark(
+                    x: .value("Month&Year", item.monthAndYear),
+                    y: .value("TotalExpenses", item.totalCosts)
+                )
+                .foregroundStyle(Color.black.gradient)
+                .cornerRadius(5)
+            }
+            .onAppear()
+            .frame(height: 400)
+            .padding(10)
+            
+            Button{
+                print("--------------------------")
+                print(temp_data)
+            }
+                label: {Text("asdf")
+            }
+                      
+            Spacer()
+        }
+        
     }
 }

@@ -23,7 +23,7 @@ class CloudKitViewModel: ObservableObject{
     
     init(){
         fetchItems()
-        fillImportantData(beginningMonthAndYear: "08-2022", endMonthAndYear: currentMonthMM() + "-" + String(currentYear()))
+        fillImportantData(beginningMonthAndYear: fiveMonthsAgo(), endMonthAndYear: currentMonthMM() + "-" + String(currentYear()))
         
     }
     
@@ -125,7 +125,9 @@ class CloudKitViewModel: ObservableObject{
         queryOperation.queryResultBlock = {[weak self] returnedResult in
             //print("RETURNED RESULT: \(returnedResult)")
             returnedItems = returnedItems.reversed() //This is so that the ShowExpensesView shows the expenses from the latest to oldest
-            self?.expenses = returnedItems
+            DispatchQueue.main.async{
+                self?.expenses = returnedItems
+            }
         }
         addOperations(operation: queryOperation)
         
@@ -140,6 +142,7 @@ class CloudKitViewModel: ObservableObject{
      Outputs the data to show. The input format is "mm-yyyy"
      */
     func fillImportantData(beginningMonthAndYear: String, endMonthAndYear: String){
+        
         var importantDataPoints: [String:MonthlyData] = [:]                                        //initialize output
         
         let calendar = Calendar.current
@@ -244,8 +247,13 @@ class CloudKitViewModel: ObservableObject{
                 return date1 < date2
             }
             
-            self?.monthlyDataPoints = importantDataPoints
-            self?.monthlyDataPointsChart = sortedDashboardMonthlyData
+            DispatchQueue.main.async{
+                self?.monthlyDataPoints = importantDataPoints
+                self?.monthlyDataPointsChart = sortedDashboardMonthlyData
+            }
+            
+            
+            
             
         }
         addOperations(operation: queryOperation)

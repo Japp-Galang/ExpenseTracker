@@ -207,7 +207,6 @@ func fiveMonthsAgo() -> String {
     let date = Calendar.current.date(byAdding: .month, value: -5, to: Date())!
     let formatter = DateFormatter()
     formatter.dateFormat = "MM-yyyy"
-    
     return formatter.string(from: date)
 }
 
@@ -221,6 +220,13 @@ func monthName(_ month: String) -> String {
     }
     dateFormatter.dateFormat = "MMMM"
     return dateFormatter.string(from: date)
+}
+
+
+
+func getMonthNumber(from month: String) -> String {
+    let months = ["January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06", "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"]
+    return months[month] ?? ""
 }
 
 
