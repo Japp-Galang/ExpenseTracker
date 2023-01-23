@@ -20,12 +20,7 @@ class CloudKitViewModel: ObservableObject{
     @Published var monthlyDataPoints: [String:MonthlyData] = [:]
     @Published var monthlyDataPointsChart: [MonthlyData] = []
 
-    
-    init(){
-        fetchItems()
-        fillImportantData(beginningMonthAndYear: fiveMonthsAgo(), endMonthAndYear: currentMonthMM() + "-" + String(currentYear()))
-        
-    }
+ 
     
     private func getiCloudStatus() {
         CKContainer.default().accountStatus { [weak self] returnedStatus, returnedError in DispatchQueue.main.async{

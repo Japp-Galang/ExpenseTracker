@@ -21,7 +21,7 @@ struct ChartsView: View {
     @State var selectedMonthEnd = currentMonthMMMM()
     @State var endMonthAndYear: String = String(currentMonthMM()) + "-" + String(currentYear())
     
-    @State var temp_data: [MonthlyData] = []
+   
     @State var showChartSettings: Bool = false
     
     
@@ -106,14 +106,14 @@ struct ChartsView: View {
                                  
                                 //TEST2
                                 Button{
-                                    temp_data = []
+                                   
                                 }
                                 label:{
                                     Text("RESET")
                                 }
                                 
                                 .sheet(isPresented: $showChartSettings){
-                                    DisplayChartView(temp_data: temp_data)
+                                    DisplayChartView(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
                                 }
                             }
                         }
@@ -130,9 +130,9 @@ struct ChartsView: View {
         endMonthAndYear = String(getMonthNumber(from: selectedMonthEnd) + "-" + String(selectedYearEnd))
         
         
-        vm.fillImportantData(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
+        
          
-        temp_data = vm.monthlyDataPointsChart
+        
         
     }
 }
@@ -144,14 +144,13 @@ struct ChartsView_Previews: PreviewProvider {
 }
 
 struct DisplayChartView: View {
-    let temp_data: [MonthlyData]
+    let beginningMonthAndYear: String
+    let endMonthAndYear: String
+    
+    @StateObject var vm = CloudKitViewModel()
     
     
-    init(temp_data: [MonthlyData]) {
-        self.temp_data = temp_data
-        print("//////////////////////")
-        print(temp_data)
-    }
+      
     var body: some View {
         VStack{
             Text("Monthly Expenses for the past n months")
@@ -159,7 +158,7 @@ struct DisplayChartView: View {
                 .padding([.top], 20)
                 .foregroundColor(TEXT_COLOR)
             
-            Chart(temp_data) { item in
+            Chart(vm.monthlyDataPointsChart) { item in
                 BarMark(
                     x: .value("Month&Year", item.monthAndYear),
                     y: .value("TotalExpenses", item.totalCosts)
@@ -167,19 +166,25 @@ struct DisplayChartView: View {
                 .foregroundStyle(Color.black.gradient)
                 .cornerRadius(5)
             }
-            .onAppear()
             .frame(height: 400)
             .padding(10)
             
             Button{
                 print("--------------------------")
-                print(temp_data)
+                print(vm.monthlyDataPointsChart)
+                
             }
                 label: {Text("asdf")
             }
                       
             Spacer()
         }
+        .onAppear{
+            print("beginning Month and Year: \(beginningMonthAndYear)")
+            print("end Month and Year: \(endMonthAndYear)")
+            vm.fillImportantData(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
+        }
+        
         
     }
 }
