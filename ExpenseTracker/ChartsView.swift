@@ -16,6 +16,7 @@ struct ChartsView: View {
     @State var selectedMonthBeginning = monthName(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5))
     @State var beginningMonthAndYear: String = String(takeSubstring(word: fiveMonthsAgo(), beginning: 0, end: -5)) + "-" + String(takeSubstring(word: fiveMonthsAgo(), beginning: 3, end: 0))
         
+    @State var TEMPORARY: Date = Date()
     
     @State var selectedYearEnd = currentYear()
     @State var selectedMonthEnd = currentMonthMMMM()
@@ -45,95 +46,81 @@ struct ChartsView: View {
         NavigationView{
             ZStack{
                 VStack{
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(SECONDARY_ACCENT)
-                        .overlay{
-                            VStack{
-                                Text("Choose date range")
-                                
-                                //Beginning Date
-                                HStack{
-                                    Text("Start")
-                                    Picker("select year", selection: $selectedYearBeginning){
-                                        ForEach(years, id: \.self) { year in
-                                            Text("\(String(year))")
-                                        }
-                                    }
-                                        .clipped()
-                                    Picker("select month", selection: $selectedMonthBeginning) {
-                                        ForEach(months, id: \.self) { month in
-                                            Text(month).tag(month)
-                                        }
-                                    }
-                                        .onReceive([selectedMonthBeginning].publisher.first()) { (value) in
-                                                    selectedMonthBeginning = value
-                                                }
-                                        .clipped()
+                    
+                    VStack{
+                        Text("Choose date range")
+                        
+                        //Beginning Date
+                        HStack{
+                            Text("Start")
+                                .padding(.leading, 15)
+                            Spacer()
+                            Picker("select year", selection: $selectedYearBeginning){
+                                ForEach(years, id: \.self) { year in
+                                    Text("\(String(year))")
                                 }
+                            }
+                            .frame(width: 100, height: 50)
+                            
+                            
                                 
-                                //End Date
-                                HStack{
-                                    Text("End")
-                                    Picker("select year", selection: $selectedYearEnd){
-                                        ForEach(years, id: \.self) { year in
-                                            Text("\(String(year))")
-                                        }
-                                    }
-                                        .clipped()
-                                    Picker("select month", selection: $selectedMonthEnd) {
-                                        ForEach(months, id: \.self) { month in
-                                            Text(month).tag(month)
-                                        }
-                                    }
-                                        .onReceive([selectedMonthEnd].publisher.first()) { (value) in
-                                                    selectedMonthEnd = value
-                                                }
-                                        .clipped()
+                            Picker("select month", selection: $selectedMonthBeginning) {
+                                ForEach(months, id: \.self) { month in
+                                    Text(month).tag(month)
                                 }
+                            }
+                            
+                        }
+                        
+                        //End Date
+                        HStack{
+                            Text("End")
+                                .padding(.leading, 15)
+                            Spacer()
+                            Picker("select year", selection: $selectedYearEnd){
+                                ForEach(years, id: \.self) { year in
+                                    Text("\(String(year))")
+                                }
+                            }
                                 
-                                
-                                //TEST
-                                
-                                Button{
-  
-                                    updateChart()
-                                    showChartSettings.toggle()
-                                    
-                                }
-                                label:{
-                                    Text("GO")
-                                }
-                                 
-                                //TEST2
-                                Button{
-                                   
-                                }
-                                label:{
-                                    Text("RESET")
-                                }
-                                
-                                .sheet(isPresented: $showChartSettings){
-                                    DisplayChartView(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
+                            Picker("select month", selection: $selectedMonthEnd) {
+                                ForEach(months, id: \.self) { month in
+                                    Text(month).tag(month)
                                 }
                             }
                         }
+                        
+                        
+                        //Go button to confirm choices to view chart
+                        Button{
+                            updateBeginningAndEnd()
+                            showChartSettings.toggle()
+                        }
+                        label:{
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.blue)
+                                .overlay{
+                                    Text("Show Chart")
+                                        .foregroundColor(.white)
+                                }
+                                .frame(width: 200, height: 100)
+                        }
+
+                        .sheet(isPresented: $showChartSettings){
+                            DisplayChartView(beginningMonthAndYear: beginningMonthAndYear, endMonthAndYear: endMonthAndYear)
+                                .presentationDetents([.large, .medium])
+                        }
+                    }
+                        
                 }
             }
             
         }
         
     }
-    func updateChart() {
-        
+    func updateBeginningAndEnd() {
         beginningMonthAndYear = String(getMonthNumber(from: selectedMonthBeginning) + "-" + String(selectedYearBeginning))
-        
         endMonthAndYear = String(getMonthNumber(from: selectedMonthEnd) + "-" + String(selectedYearEnd))
-        
-        
-        
-         
-        
-        
     }
 }
 
